@@ -1,0 +1,37 @@
+name: "Scrape data and commit"
+on:
+  schedule:
+    - cron: "*/10 6-23 * * *"  # 每天 6:00 - 23:50，每 10 分钟执行一次
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Step1: Checkout repo
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      # Step2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      # Step3: Install dependencies
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      # Step4: Run the scrape script
+      - name: Run scraper
+        run: python scrape.py
+
+      # Step5: Commit changes
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.csv
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update data on $(date)"
+          git push
