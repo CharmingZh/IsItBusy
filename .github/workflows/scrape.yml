@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # 关键！允许 Actions 推送到仓库
+  contents: write  # 允许 GitHub Actions 推送到仓库
 
 jobs:
   build:
@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false  # 重要：防止使用默认 token，改用手动配置的 token
 
       - name: Set up Python
         uses: actions/setup-python@v3
@@ -35,4 +33,4 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data.csv
           git diff --quiet && git diff --staged --quiet || git commit -m "Update data on $(date)"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push
