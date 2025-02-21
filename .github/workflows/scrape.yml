@@ -1,5 +1,6 @@
 name: "Scrape data and commit"
 on:
+  # Update schedule to force GitHub to register it again
   schedule:
     - cron: "*/10 * * * *"
   workflow_dispatch:
