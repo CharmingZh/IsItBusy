@@ -2,68 +2,48 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Gym Data</title>
-  <!-- 引入ECharts CDN -->
+  <title>Gym Occupancy Data</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
   <style>
-    body { margin: 0; padding: 0; }
-    #chart { width: 100%; height: 600px; }
+    body { font-family: Arial, sans-serif; text-align: center; }
+    #chart { width: 100%; height: 500px; margin: 0 auto; }
   </style>
 </head>
 <body>
-  <h2>健身房人数统计 (data.csv)</h2>
+  <h2>Gym Occupancy Over Time</h2>
   <div id="chart"></div>
 
   <script>
-    async function drawChart() {
-      // 拉取仓库同级的 raw csv：
-      // 如果你的仓库是 public，可以用原始raw链接：
-      //   https://raw.githubusercontent.com/<YourUser>/gym-stats/main/data.csv
-      // 或者相对路径如 './data.csv' (在Pages环境下，如果docs/与data.csv同级，需要相对路径小心处理)
-      // let csvUrl = 'https://raw.githubusercontent.com/<YourUser>/gym-stats/main/data.csv';
-      let csvUrl = '../data.csv';
+    async function loadData() {
+      let response = await fetch('https://raw.githubusercontent.com/CharmingZh/IsItBusy/main/data.csv');
+      let text = await response.text();
 
-
-      let resp = await fetch(csvUrl);
-      let text = await resp.text();
-
-      // 解析 CSV
       let lines = text.trim().split("\n");
-      // lines[0] 是表头: time,west,east,circle
-      let dataPoints = [];
-      for (let i = 1; i < lines.length; i++) {
-        let [time, west, east, circle] = lines[i].split(",");
-        dataPoints.push({ time, west: Number(west), east: Number(east), circle: Number(circle) });
-      }
+      let dataPoints = lines.slice(1).map(line => {
+        let [time, west, east, circle] = line.split(",");
+        return { time, west: Number(west), east: Number(east), circle: Number(circle) };
+      });
 
-      // 准备ECharts数据
       let xAxisData = dataPoints.map(dp => dp.time);
       let westSeries = dataPoints.map(dp => dp.west);
       let eastSeries = dataPoints.map(dp => dp.east);
       let circleSeries = dataPoints.map(dp => dp.circle);
 
-      let chartDom = document.getElementById('chart');
-      let myChart = echarts.init(chartDom);
-
+      let chart = echarts.init(document.getElementById('chart'));
       let option = {
         tooltip: { trigger: 'axis' },
-        legend: { data: ['West','East','Circle'] },
-        xAxis: {
-          type: 'category',
-          data: xAxisData,
-          axisLabel: { rotate: 45 } // 时间多可以倾斜显示
-        },
+        legend: { data: ['West', 'East', 'Circle'] },
+        xAxis: { type: 'category', data: xAxisData, axisLabel: { rotate: 45 } },
         yAxis: { type: 'value' },
         series: [
-          { name: 'West',   type: 'line', data: westSeries },
-          { name: 'East',   type: 'line', data: eastSeries },
+          { name: 'West', type: 'line', data: westSeries },
+          { name: 'East', type: 'line', data: eastSeries },
           { name: 'Circle', type: 'line', data: circleSeries }
         ]
       };
-      myChart.setOption(option);
+      chart.setOption(option);
     }
-
-    drawChart();
+    loadData();
   </script>
 </body>
 </html>
