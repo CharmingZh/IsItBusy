@@ -1,0 +1,42 @@
+name: "Scrape data and commit"
+on:
+  schedule:
+    - cron: "*/10 * * * *"  # 每 10 分钟运行一次
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Run the scrape script
+        run: python scrape.py
+
+      - name: Copy `data.csv` to `docs/`
+        run: |
+          mkdir -p docs
+          cp data.csv docs/data.csv
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data.csv
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update data.csv for GitHub Pages on $(date)"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
