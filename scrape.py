@@ -33,8 +33,8 @@ def scrape_and_update_csv():
     current_date = scrape_time.split(" ")[0]
     new_line = f"{scrape_time},{west_total},{east_total},{circle_total}\n"
 
-    data_file = "/home/zjm/IsItBusy/docs/data/today_data.csv"
-    old_data_file = "/home/zjm/IsItBusy/docs/data/total_detailed_data.csv"
+    data_file = "docs/data/today_data.csv"
+    old_data_file = "docs/data/total_detailed_data.csv"
 
     # 4. 检查 today_data.csv 是否已有数据，并判断最后一行的日期
     lines = []

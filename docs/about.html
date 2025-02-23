@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Markdown Renderer</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap 5 Bundle JS (includes Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <!-- 引入 marked.js 库 -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- 引入 MathJax -->
@@ -28,6 +32,13 @@
       border-radius: 5px;
       font-family: 'Arial', sans-serif;
       line-height: 1.6;
+    }
+    /* Carousel中的图片同样限制为85% */
+    .carousel-item img {
+      display: block;
+      margin: auto;
+      width: 100%;
+      height: auto;
     }
   </style>
 </head>
@@ -97,53 +108,7 @@ $\\delta = \\frac{1}{\\sigma} \\quad \\Longrightarrow \\quad \\sigma = \\frac{1}
 >   $P(1\\le X\\le 2)=\\Phi(1.087)-0.5\\approx 0.861-0.5=0.361,$
 >   约为 36.1%，与 35% 也较为接近。
 
-
-## 1.3 可视化代码示例
-
-下面提供一段 Python 代码，利用 matplotlib 和 scipy 库绘制估计的正态分布曲线，并标出均值和关键分位数（25%、50%、75%、95%）以及高亮显示两个目标区间。
-
-\`\`\`python
-import numpy as np
-import matplotlib.pyplot as plt
-import scipy.stats as stats
-
-# 根据数值求解结果
-mu = 1.0       # 均值 1 小时
-sigma = 0.92   # 标准差约 0.92 小时
-
-# 生成 x 轴数据
-x = np.linspace(0, 4, 1000)
-pdf = stats.norm.pdf(x, mu, sigma)
-
-# 计算关键分位数
-q25 = stats.norm.ppf(0.25, mu, sigma)   # 25%分位数
-median = stats.norm.ppf(0.5, mu, sigma)   # 中位数
-q75 = stats.norm.ppf(0.75, mu, sigma)     # 75%分位数
-q95 = stats.norm.ppf(0.95, mu, sigma)     # 95%分位数
-
-plt.figure(figsize=(8, 5))
-plt.plot(x, pdf, label=f'N({mu:.2f}, {sigma:.2f}²)', color='black')
-
-# 绘制均值和分位数的虚线
-plt.axvline(mu, color='red', linestyle='--', label=f'均值 = {mu:.2f}h')
-plt.axvline(q25, color='green', linestyle='--', label=f'25%分位 = {q25:.2f}h')
-plt.axvline(median, color='blue', linestyle='--', label=f'中位数 = {median:.2f}h')
-plt.axvline(q75, color='purple', linestyle='--', label=f'75%分位 = {q75:.2f}h')
-plt.axvline(q95, color='orange', linestyle='--', label=f'95%分位 = {q95:.2f}h')
-
-# 高亮显示目标区间
-plt.fill_between(x, pdf, where=(x>=0.5) & (x<=1), color='yellow', alpha=0.3, label='0.5~1h 区间')
-plt.fill_between(x, pdf, where=(x>=1) & (x<=2), color='cyan', alpha=0.3, label='1~2h 区间')
-
-plt.title("训练时间的正态分布估计")
-plt.xlabel("训练时间（小时）")
-plt.ylabel("概率密度")
-plt.legend()
-plt.grid(True)
-plt.show()
-\`\`\`
-
-## 1.4 结论
+## 1.3 结论
 
 经过严格的数值求解，本次估计得到的正态分布参数为：
 
@@ -158,7 +123,7 @@ plt.show()
 考虑到正态分布模型的连续性及其对称性，所得结果已较好地近似反映题目给出的比例。实际应用中，可以根据更多数据进一步调整参数，以获得更准确的描述。
 
 <!--![Visualization of the Normal Distribution of Individual Training Time](pic/normal_distribution.png)-->
-<img src="pic/normal_distribution.png" alt="Visualization of the Normal Distribution of Individual Training Time." style="width:85%;" />
+<img src="pic/normal_distribution.png" alt="Visualization of the Normal Distribution of Individual Training Time." style="width:100%;" />
 
 
 # 2. 最受欢迎的健身时段
@@ -175,75 +140,236 @@ plt.show()
 >
 > - 约 **16%** 的健身房会员在晚间 8 点至 11 点期间健身。
 
-
-\`\`\`python
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.interpolate import interp1d  # <-- Add this line
-import scipy.stats as stats
-import matplotlib.patches as patches
-
-# Define the intervals along with the attendance percentages and corresponding colors.
-# Each tuple contains: (start_time, end_time, attendance_fraction, label, color)
-intervals = [
-    (5, 9, 0.38, "5-9 AM (38%)", "lightblue"),
-    (9, 12, 0.29, "9-12 AM (29%)", "lightgreen"),
-    (12, 14, 0.25, "12-2 PM (25%)", "lightcoral"),
-    (14, 17, 0.20, "2-5 PM (20%)", "plum"),
-    (17, 20, 0.25, "5-8 PM (25%)", "khaki"),
-    (20, 23, 0.16, "8-11 PM (16%)", "lightsalmon")
-]
-
-# Compute midpoints for interpolation.
-time_midpoints = np.array([ (start + end) / 2 for start, end, att, lab, col in intervals ])
-attendance = np.array([ att for start, end, att, lab, col in intervals ])
-
-# Create a cubic interpolation function based on the data points.
-interp_func = interp1d(time_midpoints, attendance, kind='cubic')
-
-# Generate a dense array for the time axis for smooth curve plotting.
-time_dense = np.linspace(time_midpoints.min(), time_midpoints.max(), 300)
-attendance_dense = interp_func(time_dense)
-
-# Set up the plot.
-plt.figure(figsize=(12, 6))
-ax = plt.gca()
-
-# Plot the interpolated curve and original data points.
-plt.plot(time_dense, attendance_dense, label='Cubic Spline Interpolation', color='blue')
-plt.scatter(time_midpoints, attendance, color='red', label='Data Points', zorder=5)
-
-# Draw a rectangle for each time interval, with height proportional to attendance.
-for start, end, att, label, color in intervals:
-    width = end - start
-    rect = patches.Rectangle((start, 0), width, att, facecolor=color, alpha=0.3, label=label)
-    ax.add_patch(rect)
-
-plt.title("Interpolated Gym Attendance with Time Intervals (Height Reflects Attendance)")
-plt.xlabel("Time of Day (Hour)")
-plt.ylabel("Attendance Fraction")
-plt.xticks(np.arange(5, 24, 1))
-plt.grid(True)
-
-# To avoid duplicate legend entries, create a unique dictionary of handles.
-handles, labels = plt.gca().get_legend_handles_labels()
-from collections import OrderedDict
-unique = OrderedDict(zip(labels, handles))
-plt.legend(unique.values(), unique.keys(), loc='upper right')
-
-plt.savefig('workout_time_intervals.png', dpi=300)
-plt.show()
-
-\`\`\`
-
-经过数值求解，本次得到的
 <img src="pic/workout_time_intervals.png" alt="Visualization of the most favorite workout time." style="width:100%;" />
+
+# 3. 历史数据讨论
+
+本节将对历史数据进行深入讨论，并结合图表进行分析，探讨健身房的使用趋势以及各时段的实时人数变化。通过数据观察，我们可以看出以下几点趋势和特征。
+
+
+## 3.1 健身人数整体观察
+
+<img src="output_images/01_daily_attendance_trend.png" alt="Daily Attendance Trend" style="width:100%;" />
+
+图 01 显示了多年来每日健身房进馆人数的变化趋势。总体来看，随着时间的推移，健身人数呈现稳步上升的趋势。值得注意的是，在夏季假期期间，进馆人数出现明显下降，这可能与在校生人数减少及季节性休假有关。
+
+<img src="output_images/02_attendance_distribution_by_weekday.png" alt="Attendance Distribution by Weekday" style="width:100%;" />
+
+图 02 通过箱型图展示了各个星期的出勤分布。从图中可以看出，周末的健身人数普遍较低，这可能与过去健身房周末不开张或交通不便等因素有关。
+
+
+## 3.2 单日健身时段分析
+
+<img src="output_images/03_estimated_in_gym_count_heatmap.png" alt="Estimated In-Gym Count Heatmap" style="width:100%;" />
+**图 03：各时段在馆人数估计热力图**
+
+从图 03 可以观察到，健身房在晚餐后到夜间的时段内人数较多，这表明大部分人倾向于在这段时间锻炼。
+
+### 3.2.1 工作日时段实时人数推测
+
+<div id="carouselGroup04" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <!-- 示例：Group 04 内假设有两张图片，请根据实际情况修改文件名 -->
+    <div class="carousel-item active">
+      <img src="output_images/04_average_estimated_in_gym_monday.png" alt="Group 04 - Image 1">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 04a：周一实时在馆人数估计</h5>
+      </div>
+    </div>
+    <div class="carousel-item active">
+      <img src="output_images/04_average_estimated_in_gym_tuesday.png" alt="Group 04 - Image 2">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 04b：周二实时在馆人数估计</h5>
+      </div>
+    </div>
+    <div class="carousel-item active">
+      <img src="output_images/04_average_estimated_in_gym_wednesday.png" alt="Group 04 - Image 3">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 04c：周三实时在馆人数估计</h5>
+      </div>
+    </div>
+    <div class="carousel-item active">
+      <img src="output_images/04_average_estimated_in_gym_thursday.png" alt="Group 04 - Image 4">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 04d：周四实时在馆人数估计</h5>
+      </div>
+    </div>
+    <div class="carousel-item active">
+      <img src="output_images/04_average_estimated_in_gym_friday.png" alt="Group 04 - Image 5">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 04e：周五实时在馆人数估计</h5>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselGroup04" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselGroup04" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+### 3.2.2 周末时段实时人数推测
+
+下面的轮播图展示了周末（周六和周日）的实时在馆人数估计情况：
+
+<div id="carouselGroup05" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="output_images/05_average_estimated_in_gym_saturday.png" alt="Weekend: Saturday" style="width:100%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 05a：周六实时在馆人数估计</h5>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="output_images/05_average_estimated_in_gym_sunday.png" alt="Weekend: Sunday" style="width:100%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 05b：周日实时在馆人数估计</h5>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselGroup05" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselGroup05" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+### 3.2.3 整体健身时段分析
+
+<img src="output_images/06_combined_average_estimated_in_gym_by_weekday.png" alt="Combined Average Estimated In-Gym Count by Weekday" style="width:100%;" />
+**图 06：各时段综合在馆人数估计**
+
+从图 06 中可以看出，全周在馆人数的分布存在明显的高峰时段，表明大部分健身者倾向于在晚餐后至夜间进行锻炼。
+
+## 3.3 按年观察每周不同时刻的实时健身人数
+
+下面的轮播图（Group 09）展示了不同年份的整合数据。通过对比 2020 年到 2023 年的数据，我们可以发现健身人数在不同年份的变化趋势。
+
+
+<div id="carouselGroup09" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <!-- 示例：Group 09 内假设有两张图片 -->
+    <div class="carousel-item active">
+      <img src="output_images/09_integration_by_year_2020.png" alt="Group 09 - 2020" style="width:100%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Figure 09a: Integrated Analysis for 2020</h5>
+      </div>
+    </div>
+    <div class="carousel-item active">
+      <img src="output_images/09_integration_by_year_2021.png" alt="Group 09 - 2021" style="width:100%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Figure 09b: Integrated Analysis for 2021</h5>
+      </div>
+    </div>
+    <div class="carousel-item active">
+      <img src="output_images/09_integration_by_year_2022.png" alt="Group 09 - 2022" style="width:100%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Figure 09c: Integrated Analysis for 2022</h5>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="output_images/09_integration_by_year_2023.png" alt="Group 09 - 2023" style="width:100%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Figure 09d: Integrated Analysis for 2023</h5>
+      </div>
+    </div>
+    <div class="carousel-item active">
+      <img src="output_images/09_integration_by_year_2024.png" alt="Group 09 - 2024" style="width:100%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Figure 09e: Integrated Analysis for 2024</h5>
+      </div>
+    </div>
+    <div class="carousel-item active">
+      <img src="output_images/09_integration_by_year_2025.png" alt="Group 09 - 2025" style="width:100%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Figure 09f: Integrated Analysis for 2025</h5>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselGroup09" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselGroup09" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>sss
+
+
+## 3.4 不同年份特定日期的实时人数分布
+
+以下轮播图（Group 10-16）展示了不同年份中，特定日期（如周一至周日）的实时在馆人数分布情况。此数据有助于分析各年份在同一天内的实时动态差异。
+
+
+<div id="carouselGroups10to16" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="output_images/10_mondays_by_year.png" alt="周一数据按年份" style="width:70%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 10：各年份周一数据</h5>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="output_images/11_tuesdays_by_year.png" alt="周二数据按年份" style="width:70%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 11：各年份周二数据</h5>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="output_images/12_wednesdays_by_year.png" alt="周三数据按年份" style="width:70%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 12：各年份周三数据</h5>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="output_images/13_thursdays_by_year.png" alt="周四数据按年份" style="width:70%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 13：各年份周四数据</h5>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="output_images/14_fridays_by_year.png" alt="周五数据按年份" style="width:70%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 14：各年份周五数据</h5>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="output_images/15_saturdays_by_year.png" alt="周六数据按年份" style="width:70%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 15：各年份周六数据</h5>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <img src="output_images/16_sundays_by_year.png" alt="周日数据按年份" style="width:70%;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>图 16：各年份周日数据</h5>
+      </div>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselGroups10to16" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">上一张</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselGroups10to16" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">下一张</span>
+  </button>
+</div>
 
 
 
 ### References
 
-- [Ref$^{[1]}$](https://gymdesk.com/blog/gym-membership-statistics/)
+- [Website] 101 Gym Membership Statistics to Know [Ref$^{[1]}$](https://gymdesk.com/blog/gym-membership-statistics/)
+- [Source Code] Visualization of the Normal Distribution of Individual Training Time. [Ref$^{[2]}$](https://github.com/CharmingZh/IsItBusy/blob/master/analysis/normal_distribution.py)
+- [Source Code] Visualization of the most favorite workout time. [Ref$^{[3]}$](https://github.com/CharmingZh/IsItBusy/blob/master/analysis/workout_time.py)
 
 
     `;
@@ -251,5 +377,8 @@ plt.show()
     // 使用 marked 将 Markdown 转换为 HTML，并插入到 #markdown 区域中
     document.getElementById('markdown').innerHTML = marked.parse(markdownContent);
   </script>
+
+
+
 </body>
 </html>
