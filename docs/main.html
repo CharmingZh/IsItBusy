@@ -244,8 +244,8 @@
 
     // 处理 CSV 文本
     function processCSV(csvText) {
-      const MEAN_HOURS = 1.22;
-      const STD_HOURS  = 0.4;
+      const MEAN_HOURS = 0.96;
+      const STD_HOURS  = 0.226;
       let lines = csvText.trim().split("\n");
       let rawData = lines.map(line => {
         let [timeStr, w, e, c] = line.split(/,\s*/);
@@ -359,7 +359,7 @@
 
       function computeDiff(arr) {
         const currentVal = arr[currentIndex];
-        const targetTime = new Date(currentTime.getTime() - 15 * 60000);
+        const targetTime = new Date(currentTime.getTime() - 60 * 60000);
         let prevIndex = 0;
         for (let i = 0; i < timeData.length; i++) {
           if (timeData[i] <= targetTime) {
