@@ -249,8 +249,8 @@
 
     // 处理 CSV 文本
     function processCSV(csvText) {
-      const MEAN_HOURS = 1.22;
-      const STD_HOURS  = 0.4;
+      const MEAN_HOURS = 1.00;
+      const STD_HOURS  = 0.92;
       let lines = csvText.trim().split("\n");
       let rawData = lines.map(line => {
         let [timeStr, w, e, c] = line.split(/,\s*/);
