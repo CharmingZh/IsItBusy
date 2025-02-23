@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gym Analysis Report - Image Galleries</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- marked.js for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <style>
+    body {
+      background-color: #f4f4f4;
+    }
+    #markdown {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: "Times New Roman", serif;
+      line-height: 1.8;
+    }
+    /* 单张图片统一限制宽度为85% */
+    .single-image {
+      display: block;
+      margin: 30px auto;
+      width: 85%;
+    }
+    .gallery-title {
+      text-align: center;
+      margin: 40px 0 20px;
+      font-family: "Times New Roman", serif;
+    }
+    /* Carousel中的图片同样限制为85% */
+    .carousel-item img {
+      display: block;
+      margin: auto;
+      width: 85%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Markdown Rendering Area -->
+  <div id="markdown">Loading markdown content...</div>
+
+  <!-- 单张图片展示，前缀为 01、02、03、06、07、08 -->
+  <div class="container my-4">
+    <h2 class="gallery-title">Gallery: Single Images</h2>
+    <!-- Group 01 -->
+    <div class="text-center">
+      <img src="../output_images/01_daily_attendance_trend.png" alt="Daily Attendance Trend" class="single-image">
+      <p>Figure 01: Daily Attendance Trend</p>
+    </div>
+    <!-- Group 02 -->
+    <div class="text-center">
+      <img src="../output_images/02_attendance_distribution_by_weekday.png" alt="Attendance Distribution by Weekday" class="single-image">
+      <p>Figure 02: Attendance Distribution by Weekday</p>
+    </div>
+    <!-- Group 03 -->
+    <div class="text-center">
+      <img src="../output_images/03_estimated_in_gym_count_heatmap.png" alt="Estimated In-Gym Count Heatmap" class="single-image">
+      <p>Figure 03: Estimated In-Gym Count Heatmap</p>
+    </div>
+    <!-- Group 06 -->
+    <div class="text-center">
+      <img src="../output_images/06_combined_average_estimated_in_gym_by_weekday.png" alt="Combined Average Estimated In-Gym Count" class="single-image">
+      <p>Figure 06: Combined Average Estimated In-Gym Count by Weekday</p>
+    </div>
+    <!-- Group 07 -->
+    <div class="text-center">
+      <img src="../output_images/07_attendance_2024-03-01.png" alt="Attendance on 2024-03-01" class="single-image">
+      <p>Figure 07: Gym Attendance on 2024-03-01</p>
+    </div>
+    <!-- Group 08 -->
+    <div class="text-center">
+      <img src="../output_images/08_estimated_in_gym_2024-03-01.png" alt="Estimated In-Gym Count on 2024-03-01" class="single-image">
+      <p>Figure 08: Estimated In-Gym Count on 2024-03-01</p>
+    </div>
+  </div>
+
+  <!-- Combined Gallery for Groups 10-16 使用 Carousel -->
+  <div class="container my-4">
+    <h2 class="gallery-title">Gallery: Combined Analysis by Year (Groups 10-16)</h2>
+    <div id="carouselGroups10to16" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <!-- Group 10 -->
+        <div class="carousel-item active">
+          <img src="../output_images/10_mondays_by_year.png" alt="Mondays by Year">
+          <div class="carousel-caption d-none d-md-block">
+            <h5>Figure 10: Mondays by Year</h5>
+          </div>
+        </div>
+        <!-- Group 11 -->
+        <div class="carousel-item">
+          <img src="../output_images/11_tuesdays_by_year.png" alt="Tuesdays by Year">
+          <div class="carousel-caption d-none d-md-block">
+            <h5>Figure 11: Tuesdays by Year</h5>
+          </div>
+        </div>
+        <!-- Group 12 -->
+        <div class="carousel-item">
+          <img src="../output_images/12_wednesdays_by_year.png" alt="Wednesdays by Year">
+          <div class="carousel-caption d-none d-md-block">
+            <h5>Figure 12: Wednesdays by Year</h5>
+          </div>
+        </div>
+        <!-- Group 13 -->
+        <div class="carousel-item">
+          <img src="../output_images/13_thursdays_by_year.png" alt="Thursdays by Year">
+          <div class="carousel-caption d-none d-md-block">
+            <h5>Figure 13: Thursdays by Year</h5>
+          </div>
+        </div>
+        <!-- Group 14 -->
+        <div class="carousel-item">
+          <img src="../output_images/14_fridays_by_year.png" alt="Fridays by Year">
+          <div class="carousel-caption d-none d-md-block">
+            <h5>Figure 14: Fridays by Year</h5>
+          </div>
+        </div>
+        <!-- Group 15 -->
+        <div class="carousel-item">
+          <img src="../output_images/15_saturdays_by_year.png" alt="Saturdays by Year">
+          <div class="carousel-caption d-none d-md-block">
+            <h5>Figure 15: Saturdays by Year</h5>
+          </div>
+        </div>
+        <!-- Group 16 -->
+        <div class="carousel-item">
+          <img src="../output_images/16_sundays_by_year.png" alt="Sundays by Year">
+          <div class="carousel-caption d-none d-md-block">
+            <h5>Figure 16: Sundays by Year</h5>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselGroups10to16" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselGroups10to16" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Markdown & MathJax rendering script -->
+  <script>
+    const markdownContent = `
+# 1. Gym Training Duration Analysis for American Adults
+
+According to the data from **(Statista, 2021)<sup>[1]</sup>**, it is shown that:
+
+- Young adults aged **18-34** (31%) and adults aged **35-54** (31%) are the largest customer segments of gyms.
+- Among them, females spend an average of **0.3** hours per day on sports, entertainment, and exercise, while males spend an average of **0.44** hours.
+
+> - Approximately **21%** of gym enthusiasts spend **0.5 ~ 1** hour per session.
+> - Approximately **35%** of gym enthusiasts spend **1 ~ 2** hours per session.
+
+Assume the training duration $X$ follows a normal distribution $N(\\mu, \\sigma^2)$, then:
+
+1. **Condition 1**:
+   $P(0.5 \\le X \\le 1) = \\Phi\\left(\\frac{1-\\mu}{\\sigma}\\right) - \\Phi\\left(\\frac{0.5-\\mu}{\\sigma}\\right) = 0.21,$
+2. **Condition 2**:
+   $P(1 \\le X \\le 2) = \\Phi\\left(\\frac{2-\\mu}{\\sigma}\\right) - \\Phi\\left(\\frac{1-\\mu}{\\sigma}\\right) = 0.35.$
+
+Here, $\\Phi(z)$ denotes the cumulative distribution function of the standard normal distribution.
+
+## 1.1 Variable Substitution and Equations
+
+Let
+$A = \\frac{1-\\mu}{\\sigma},$
+and let
+$\\delta = \\frac{1}{\\sigma} \\quad \\Longrightarrow \\quad \\sigma = \\frac{1}{\\delta}.$
+
+Then the above equations become:
+- Condition 1:
+  $\\Phi(A) - \\Phi\\Bigl(A - 0.5\\delta\\Bigr) = 0.21,$
+- Condition 2:
+  $\\Phi(A+\\delta) - \\Phi(A) = 0.35.$
+
+These are two nonlinear equations in $A$ and $\\delta$.
+
+## 1.2 Numerical Solution
+
+Using numerical methods, the approximate solutions are:
+- $A \\approx 0,$
+- $\\delta \\approx 1.087.$
+
+Thus:
+- $\\sigma = \\frac{1}{\\delta} \\approx 0.92$ hours,
+- $\\mu = 1 - A\\sigma \\approx 1$ hour.
+
+*Verification:*
+> - For Condition 1:
+>   $\\frac{0.5-\\mu}{\\sigma} \\approx -0.5435,$
+>   $\\frac{1-\\mu}{\\sigma} = 0.$
+>   Thus, $P(0.5 \\le X \\le 1) \\approx \\Phi(0.5435)-0.5 \\approx 20.7\\%.$
+>
+> - For Condition 2:
+>   $\\frac{2-\\mu}{\\sigma} \\approx 1.087,$
+>   so $P(1 \\le X \\le 2) \\approx 36.1\\%.$
+
+## 1.3 Conclusion
+
+The estimated normal distribution parameters are:
+- Mean $\\mu \\approx 1$ hour
+- Standard deviation $\\sigma \\approx 0.92$ hours
+
+Under this model:
+- $P(0.5 \\le X \\le 1) \\approx 20.7\\%$,
+- $P(1 \\le X \\le 2) \\approx 36.1\\%.$
+
+*Further analysis and discussion can be added here based on the visualizations below.*
+
+---
+
+# 2. Most Popular Workout Time Intervals
+
+The most popular workout time is between 5 AM and 9 AM, when 38% of gym members exercise.
+
+> - Approximately **29%** work out between 9 AM and noon.
+>
+> - Approximately **25%** work out between noon and 2 PM.
+>
+> - Approximately **20%** work out between 2 PM and 5 PM.
+>
+> - Approximately **25%** work out between 5 PM and 8 PM.
+>
+> - Approximately **16%** work out between 8 PM and 11 PM.
+
+<img src="../pic/workout_time_intervals.png" alt="Most favorite workout time intervals" style="width:100%;" />
+
+### Expected Conclusions
+
+*Please add your conclusions here based on the above visualizations, e.g.:*
+- The daily attendance trends exhibit seasonal variations with specific peak weekdays.
+- The yearly integrated analysis indicates stable gym usage over the years, with some improvements on Mondays.
+- The popular workout intervals remain consistent, while individual session lengths vary slightly across demographics.
+
+### References
+
+- [Statista, 2021](https://www.statista.com)
+- [Gym Membership Statistics](https://gymdesk.com/blog/gym-membership-statistics/)
+- [Source Code] [Visualization of the Normal Distribution of Individual Training Time](https://github.com/CharmingZh/IsItBusy/blob/master/analysis/normal_distribution.py)
+- [Source Code] [Visualization of the most favorite workout time](https://github.com/CharmingZh/IsItBusy/blob/master/analysis/workout_time.py)
+    `;
+    document.getElementById('markdown').innerHTML = marked.parse(markdownContent);
+  </script>
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
