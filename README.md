@@ -1,3 +1,12 @@
+# 1. 如何使用
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <img src="docs/pic/1.jpg" alt="图片1" style="width: 32%; margin-right: 1%;">
+  <img src="docs/pic/2.jpg" alt="图片2" style="width: 32%; margin-right: 1%;">
+  <img src="docs/pic/3.jpg" alt="图片3" style="width: 32%;">
+</div>
+
+
 # 1. 美国成年人健身房训练时长统计分析
 
 根据 **（Statista，2021）<sup>[1]</sup>** 的数据显示：
