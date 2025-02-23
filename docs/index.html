@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <!-- 添加 viewport-fit=cover 以支持全屏安全区域 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>MSU Sweat Scheduler 健身房人浪预报</title>
+  <title>MSU Sweat Scheduler 健身房人浪预报🌊</title>
   <!-- 引入液晶风格字体 VT323 -->
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <!-- 引入 seedrandom 和 ECharts 库 -->
@@ -14,7 +14,7 @@
     /* 全局盒模型和安全区域 */
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
-      margin: 0;
+      margin: ;
       /* 使用安全区域变量，确保内容不被刘海、状态栏和底部手势区域遮挡 */
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       height: 100vh;
@@ -26,7 +26,7 @@
     .main-container {
       display: grid;
       grid-template-rows: auto 1fr auto;
-      height: 100%;
+      height: 85%;
     }
     /* 顶部区域：标题、实时数据和关于按钮 */
     header {
@@ -38,7 +38,7 @@
     }
     header h2 {
       margin: 0.2rem 0;
-      font-size: 1.5rem;
+      font-size: 2rem;
       color: #094b0a;
     }
     /* 实时显示区域 */
@@ -51,19 +51,19 @@
     .realtime-box {
       background: #000;
       color: #32CD32;
-      border: 3px solid #32CD32;
+      border: 4px solid #32CD32;
       border-radius: 10px;
-      padding: 0.3rem 0.5rem;
+      padding: 0.3rem 0.2rem;
       font-family: 'VT323', monospace;
-      font-size: 1.8rem;
+      font-size: 2.5rem;
       text-align: center;
-      min-width: 80px;
+      min-width: 100px;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
     .realtime-label {
-      font-size: 1.2rem;
+      font-size: 2.5rem;
       color: #fac5e8;
     }
     /* 关于按钮 */
@@ -72,7 +72,7 @@
       top: 0.5rem;
       right: 0.5rem;
       width: 35px;
-      height: 35px;
+      height: 5px;
       border-radius: 50%;
       background: #fff;
       border: 2px solid #960226;
@@ -95,7 +95,7 @@
     }
     #chart {
       width: 100%;
-      height: 100%;
+      height: 95%;
       background: #fff;
       border-radius: 15px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
@@ -103,7 +103,7 @@
     }
     /* 底部说明区域 */
     footer {
-      padding: 0.5rem;
+      padding: 2.26rem;
       text-align: center;
       font-size: 0.7rem;
       color: #555;
@@ -147,8 +147,8 @@
   <div class="main-container">
     <!-- 顶部区域 -->
     <header>
-      <h2>Sweat Scheduler</h2>
-      <h2>MSU 健身房人浪预报</h2>
+      <h2>🌧Sweat Scheduler</h2>
+      <h2>MSU 健身房人浪预报🌊</h2>
       <div id="realtime-container">
         <div class="realtime-box" id="realtime-west">
           <span class="realtime-label">West</span>
@@ -163,7 +163,7 @@
           <span class="realtime-count">--</span>
         </div>
       </div>
-      <button id="about-button" onclick="window.open('about.html', '_blank')">ℹ</button>
+      <button id="about-button" onclick="window.open('about.html', '_blank')">i</button>
     </header>
     <!-- 中间内容区域 -->
     <div class="content">
