@@ -6,7 +6,7 @@
 首先，使用浏览器打开（[🌧Sweat Scheduler | MSU 健身房人浪预报🌊](https://charmingzh.github.io/IsItBusy/)）小程序，然后按照如下步骤可以添加到桌面，方便随时访问。
 
 <div style="display: flex; justify-content: space-between; align-items: center;">
-  <img src="docs/pic/1.jpg" alt="图片1" style="width: 32%; margin-right: 1%;">
+
   <img src="docs/pic/2.jpg" alt="图片2" style="width: 32%; margin-right: 1%;">
   <img src="docs/pic/3.jpg" alt="图片3" style="width: 32%;">
 </div>
