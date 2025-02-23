@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Markdown Renderer</title>
+  <!-- 引入 marked.js 库 -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- 引入 MathJax -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* 渲染区域的样式 */
+    #markdown {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <!-- Markdown 渲染区域 -->
+  <div id="markdown">Loading markdown content...</div>
+
+  <script>
+    // 示例 Markdown 文案
+    const markdownContent = `
+# 1. 美国成年人健身房训练时长统计分析
+
+根据 **（Statista，2021）<sup>[1]</sup>** 的数据显示：
+
+ **18-34** 岁的年轻人（31%）和 **35-54** 岁的成年人（31%）是健身房的最大客群。
+其中，女性平均每天花 **0.3** 小时进行体育、娱乐和锻炼，而男性平均每天花 **0.44** 小时。
+
+> - 约 **21%** 的健身爱好者每次训练花费 **0.5 ~ 1** 小时；
+> - 约 **35%** 的健身爱好者每次训练花费 **1 ~ 2** 小时；
+
+假设训练时间 $X$ 服从正态分布 $N(\\mu, \\sigma^2)$，则有：
+
+1. **条件一**：
+   $P(0.5 \\le X \\le 1) = \\Phi\\left(\\frac{1-\\mu}{\\sigma}\\right) - \\Phi\\left(\\frac{0.5-\\mu}{\\sigma}\\right) = 0.21,$
+2. **条件二**：
+   $P(1 \\le X \\le 2) = \\Phi\\left(\\frac{2-\\mu}{\\sigma}\\right) - \\Phi\\left(\\frac{1-\\mu}{\\sigma}\\right) = 0.35.$
+
+其中 $\\Phi(z)$ 表示标准正态分布的累积分布函数。
+
+## 1.1 建立变量替换与方程
+
+令
+$A = \\frac{1-\\mu}{\\sigma},$
+同时令
+$\\delta = \\frac{1}{\\sigma} \\quad \\Longrightarrow \\quad \\sigma = \\frac{1}{\\delta}.$
+
+此时，上述方程可写为：
+- 条件一：
+  $\\Phi(A) - \\Phi\\Bigl(A - 0.5\\delta\\Bigr) = 0.21,$
+- 条件二：
+  $\\Phi(A+\\delta) - \\Phi(A) = 0.35.$
+
+这就是关于 $A$ 和 $\\delta$ 的两个非线性方程。
+
+## 1.2 数值求解
+
+利用数值方法求解这两个方程，得到的近似结果为：
+- $A \\approx 0,$
+- $\\delta \\approx 1.087.$
+
+因此，有：
+- $\\sigma = \\frac{1}{\\delta} \\approx \\frac{1}{1.087} \\approx 0.92 \\text{ 小时},$
+- $\\mu = 1 - A\\sigma \\approx 1 - 0 \\times 0.92 = 1 \\text{ 小时}.$
+
+验证
+> - 对于条件一：
+>   $\\frac{0.5-\\mu}{\\sigma} = \\frac{0.5-1}{0.92} \\approx -0.5435,$
+>   $\\frac{1-\\mu}{\\sigma} = 0.$
+>   则，
+>   $P(0.5\\le X\\le 1)=\\Phi(0)-\\Phi(-0.5435)=0.5-\\left(1-\\Phi(0.5435)\\right)=\\Phi(0.5435)-0.5.$
+>   查表得 $\\Phi(0.5435) \\approx 0.707$，因此 $P \\approx 0.207$，接近 21%。
+>
+> - 对于条件二：
+>   $\\frac{2-\\mu}{\\sigma}=\\frac{2-1}{0.92}\\approx 1.087,$
+>   $\\frac{1-\\mu}{\\sigma}=0.$
+>   则，
+>   $P(1\\le X\\le 2)=\\Phi(1.087)-0.5\\approx 0.861-0.5=0.361,$
+>   约为 36.1%，与 35% 也较为接近。
+
+
+## 1.3 可视化代码示例
+
+下面提供一段 Python 代码，利用 matplotlib 和 scipy 库绘制估计的正态分布曲线，并标出均值和关键分位数（25%、50%、75%、95%）以及高亮显示两个目标区间。
+
+\`\`\`python
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.stats as stats
+
+# 根据数值求解结果
+mu = 1.0       # 均值 1 小时
+sigma = 0.92   # 标准差约 0.92 小时
+
+# 生成 x 轴数据
+x = np.linspace(0, 4, 1000)
+pdf = stats.norm.pdf(x, mu, sigma)
+
+# 计算关键分位数
+q25 = stats.norm.ppf(0.25, mu, sigma)   # 25%分位数
+median = stats.norm.ppf(0.5, mu, sigma)   # 中位数
+q75 = stats.norm.ppf(0.75, mu, sigma)     # 75%分位数
+q95 = stats.norm.ppf(0.95, mu, sigma)     # 95%分位数
+
+plt.figure(figsize=(8, 5))
+plt.plot(x, pdf, label=f'N({mu:.2f}, {sigma:.2f}²)', color='black')
+
+# 绘制均值和分位数的虚线
+plt.axvline(mu, color='red', linestyle='--', label=f'均值 = {mu:.2f}h')
+plt.axvline(q25, color='green', linestyle='--', label=f'25%分位 = {q25:.2f}h')
+plt.axvline(median, color='blue', linestyle='--', label=f'中位数 = {median:.2f}h')
+plt.axvline(q75, color='purple', linestyle='--', label=f'75%分位 = {q75:.2f}h')
+plt.axvline(q95, color='orange', linestyle='--', label=f'95%分位 = {q95:.2f}h')
+
+# 高亮显示目标区间
+plt.fill_between(x, pdf, where=(x>=0.5) & (x<=1), color='yellow', alpha=0.3, label='0.5~1h 区间')
+plt.fill_between(x, pdf, where=(x>=1) & (x<=2), color='cyan', alpha=0.3, label='1~2h 区间')
+
+plt.title("训练时间的正态分布估计")
+plt.xlabel("训练时间（小时）")
+plt.ylabel("概率密度")
+plt.legend()
+plt.grid(True)
+plt.show()
+\`\`\`
+
+## 1.4 结论
+
+经过严格的数值求解，本次估计得到的正态分布参数为：
+
+- 均值 $\\mu \\approx 1$ 小时
+- 标准差 $\\sigma \\approx 0.92$ 小时
+
+在该模型下：
+
+- $P(0.5 \\le X \\le 1) \\approx 20.7\\%$（略低于 21%），
+- $P(1 \\le X \\le 2) \\approx 36.1\\%$（略高于 35%）。
+
+考虑到正态分布模型的连续性及其对称性，所得结果已较好地近似反映题目给出的比例。实际应用中，可以根据更多数据进一步调整参数，以获得更准确的描述。
+
+<!--![Visualization of the Normal Distribution of Individual Training Time](pic/normal_distribution.png)-->
+<img src="pic/normal_distribution.png" alt="Visualization of the Normal Distribution of Individual Training Time." style="width:85%;" />
+
+
+# 2. 最受欢迎的健身时段
+
+最受欢迎的健身时间是清晨 5 点至 9 点，38% 的健身房会员在这个时间段健身。
+
+> - 约 **29%** 的健身房会员在上午 9 点至中午期间健身。
+>
+> - 约 **25%** 的健身房会员在中午至下午 2 点期间健身。
+>
+> - 约 **20%** 的健身房会员在下午 2 点至 5 点期间健身。
+>
+> - 约 **25%** 的健身房会员在傍晚 5 点至 8 点期间健身。
+>
+> - 约 **16%** 的健身房会员在晚间 8 点至 11 点期间健身。
+
+
+\`\`\`python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import interp1d  # <-- Add this line
+import scipy.stats as stats
+import matplotlib.patches as patches
+
+# Define the intervals along with the attendance percentages and corresponding colors.
+# Each tuple contains: (start_time, end_time, attendance_fraction, label, color)
+intervals = [
+    (5, 9, 0.38, "5-9 AM (38%)", "lightblue"),
+    (9, 12, 0.29, "9-12 AM (29%)", "lightgreen"),
+    (12, 14, 0.25, "12-2 PM (25%)", "lightcoral"),
+    (14, 17, 0.20, "2-5 PM (20%)", "plum"),
+    (17, 20, 0.25, "5-8 PM (25%)", "khaki"),
+    (20, 23, 0.16, "8-11 PM (16%)", "lightsalmon")
+]
+
+# Compute midpoints for interpolation.
+time_midpoints = np.array([ (start + end) / 2 for start, end, att, lab, col in intervals ])
+attendance = np.array([ att for start, end, att, lab, col in intervals ])
+
+# Create a cubic interpolation function based on the data points.
+interp_func = interp1d(time_midpoints, attendance, kind='cubic')
+
+# Generate a dense array for the time axis for smooth curve plotting.
+time_dense = np.linspace(time_midpoints.min(), time_midpoints.max(), 300)
+attendance_dense = interp_func(time_dense)
+
+# Set up the plot.
+plt.figure(figsize=(12, 6))
+ax = plt.gca()
+
+# Plot the interpolated curve and original data points.
+plt.plot(time_dense, attendance_dense, label='Cubic Spline Interpolation', color='blue')
+plt.scatter(time_midpoints, attendance, color='red', label='Data Points', zorder=5)
+
+# Draw a rectangle for each time interval, with height proportional to attendance.
+for start, end, att, label, color in intervals:
+    width = end - start
+    rect = patches.Rectangle((start, 0), width, att, facecolor=color, alpha=0.3, label=label)
+    ax.add_patch(rect)
+
+plt.title("Interpolated Gym Attendance with Time Intervals (Height Reflects Attendance)")
+plt.xlabel("Time of Day (Hour)")
+plt.ylabel("Attendance Fraction")
+plt.xticks(np.arange(5, 24, 1))
+plt.grid(True)
+
+# To avoid duplicate legend entries, create a unique dictionary of handles.
+handles, labels = plt.gca().get_legend_handles_labels()
+from collections import OrderedDict
+unique = OrderedDict(zip(labels, handles))
+plt.legend(unique.values(), unique.keys(), loc='upper right')
+
+plt.savefig('workout_time_intervals.png', dpi=300)
+plt.show()
+
+\`\`\`
+
+经过数值求解，本次得到的
+<img src="pic/workout_time_intervals.png" alt="Visualization of the most favorite workout time." style="width:100%;" />
+
+
+
+### References
+
+- [Ref$^{[1]}$](https://gymdesk.com/blog/gym-membership-statistics/)
+
+
+    `;
+
+    // 使用 marked 将 Markdown 转换为 HTML，并插入到 #markdown 区域中
+    document.getElementById('markdown').innerHTML = marked.parse(markdownContent);
+  </script>
+</body>
+</html>
