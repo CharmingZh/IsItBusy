@@ -2,84 +2,83 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <!-- 保证页面在移动设备上按设备宽度显示 -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- 添加 viewport-fit=cover 以支持全屏安全区域 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>MSU Sweat Scheduler 健身房人浪预报</title>
   <!-- 引入液晶风格字体 VT323 -->
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-  <!-- 引入 seedrandom 库 -->
+  <!-- 引入 seedrandom 和 ECharts 库 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
   <style>
-    /* 使用 CSS Grid 将整个页面分为 3 个区域 */
+    /* 全局盒模型和安全区域 */
+    *, *::before, *::after { box-sizing: border-box; }
     html, body {
       margin: 0;
-      padding: 0;
-      height: 96vh;
+      /* 使用安全区域变量，确保内容不被刘海、状态栏和底部手势区域遮挡 */
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      height: 100vh;
       font-family: 'Arial', sans-serif;
       background: #f4f4f9;
-      /*background: #960226;*/
-      display: grid;
-      grid-template-rows: 22vh 65vh 13vh;
-      grid-template-columns: 100%;
+      overflow: hidden;
     }
-    /* 顶部区域：标题、实时人数显示和关于按钮 */
+    /* 整体页面容器采用 Grid 布局 */
+    .main-container {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: 100%;
+    }
+    /* 顶部区域：标题、实时数据和关于按钮 */
     header {
-      grid-row: 1;
-      width: 90%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      padding: 0.5rem;
+      text-align: center;
       position: relative;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     header h2 {
-      margin: 0;
-      font-size: 2rem;
+      margin: 0.2rem 0;
+      font-size: 1.5rem;
       color: #094b0a;
-      text-align: center;
     }
-    /* 实时显示容器 */
+    /* 实时显示区域 */
     #realtime-container {
-      margin-top: 15px;
-      margin-left: 20px;
       display: flex;
-      /*justify-content: center;*/
-      gap: 20px;
-      width: 100%;
-      /*align-items: center;*/
+      justify-content: center;
+      gap: 10px;
+      margin-top: 0.5rem;
     }
     .realtime-box {
       background: #000;
       color: #32CD32;
-      border: 4px solid #32CD32;
-      border-radius: 20px;
-      padding: 0px 2px;
+      border: 3px solid #32CD32;
+      border-radius: 10px;
+      padding: 0.3rem 0.5rem;
       font-family: 'VT323', monospace;
-      font-size: 3.5rem;
+      font-size: 1.8rem;
       text-align: center;
-      min-width: 100px;
+      min-width: 80px;
       display: flex;
       flex-direction: column;
+      justify-content: center;
     }
     .realtime-label {
-      display: block;
-      font-size: 2.5rem;
-      color: #fac5e8;  /* fff */
+      font-size: 1.2rem;
+      color: #fac5e8;
     }
-    /* 优化后的关于按钮：圆形图标按钮 */
+    /* 关于按钮 */
     #about-button {
       position: absolute;
-      top: 10px;
-      right: -35px;
-      width: 40px;
-      height: 40px;
+      top: 0.5rem;
+      right: 0.5rem;
+      width: 35px;
+      height: 35px;
       border-radius: 50%;
       background: #fff;
-      border: 3px solid #960226;
+      border: 2px solid #960226;
       color: #970623;
-      font-size: 1.5rem;
-      line-height: 40px;
+      font-size: 1.2rem;
+      line-height: 35px;
       text-align: center;
       cursor: pointer;
       transition: background 0.3s, color 0.3s;
@@ -89,87 +88,93 @@
       background: #32CD32;
       color: #000;
     }
-    /* 数据可视化区域 */
+    /* 中间内容区域：图表区域 */
+    .content {
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
     #chart {
-      grid-row: 2;
-      width: 90%;
-      max-width: 1200px;
-      height: 85%;
-      background: #ffffff;
+      width: 100%;
+      height: 100%;
+      background: #fff;
       border-radius: 15px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       padding: 10px;
-      justify-self: center;
-      align-self: center;
     }
     /* 底部说明区域 */
-    #footer-info {
-      grid-row: 3;
-      width: 96%;
+    footer {
+      padding: 0.5rem;
       text-align: center;
       font-size: 0.7rem;
       color: #555;
-      padding: 0px 10px;
+      background: #fff;
+      border-top: 1px solid #ddd;
       overflow: auto;
     }
-    #footer-info a {
+    footer a {
       color: #007BFF;
       text-decoration: none;
     }
-    #footer-info a:hover {
+    footer a:hover {
       text-decoration: underline;
     }
     #disclaimer {
-      margin-top: 5px;
+      margin-top: 0.3rem;
       color: #d9534f;
     }
-    /* 针对较小屏幕的优化 */
+    /* 针对较小屏幕的调整 */
     @media (max-width: 768px) {
       header h2 {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
       }
       .realtime-box {
-        font-size: 1.5rem;
-        padding: 3px 8px;
+        font-size: 1.2rem;
+        padding: 0.2rem 0.4rem;
       }
       #about-button {
-        width: 35px;
-        height: 35px;
-        font-size: 1.2rem;
-        line-height: 35px;
+        width: 30px;
+        height: 30px;
+        font-size: 1rem;
+        line-height: 30px;
       }
-      #chart {
-        width: 95%;
-        padding: 5px;
+      footer {
+        font-size: 0.65rem;
       }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h2>Sweat Scheduler</h2>
-    <h2>MSU 健身房人浪预报</h2>
-    <div id="realtime-container">
-      <div class="realtime-box" id="realtime-west">
-        <span class="realtime-label">West</span>
-        <span class="realtime-count">--</span>
+  <div class="main-container">
+    <!-- 顶部区域 -->
+    <header>
+      <h2>Sweat Scheduler</h2>
+      <h2>MSU 健身房人浪预报</h2>
+      <div id="realtime-container">
+        <div class="realtime-box" id="realtime-west">
+          <span class="realtime-label">West</span>
+          <span class="realtime-count">--</span>
+        </div>
+        <div class="realtime-box" id="realtime-east">
+          <span class="realtime-label">East</span>
+          <span class="realtime-count">--</span>
+        </div>
+        <div class="realtime-box" id="realtime-circle">
+          <span class="realtime-label">Circle</span>
+          <span class="realtime-count">--</span>
+        </div>
       </div>
-      <div class="realtime-box" id="realtime-east">
-        <span class="realtime-label">East</span>
-        <span class="realtime-count">--</span>
-      </div>
-      <div class="realtime-box" id="realtime-circle">
-        <span class="realtime-label">Circle</span>
-        <span class="realtime-count">--</span>
-      </div>
+      <button id="about-button" onclick="window.open('about.html', '_blank')">ℹ</button>
+    </header>
+    <!-- 中间内容区域 -->
+    <div class="content">
+      <div id="chart"></div>
     </div>
-    <button id="about-button" onclick="window.open('about.html', '_blank')">ℹ</button>
-  </header>
-  <div id="chart"></div>
-  <div id="footer-info">
-    <p>*Data source：<a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">MSU Recreational Sports and Fitness Services</a>。</p>
-    <p>Thanks to MSU for providing the data, this project is for personal study and time planning purposes only, if there is any violation, please contact me and I will remove it immediately. <b>E-mail: zhan2374 [at] msu [dot] edu</b></p>
-    <p id="disclaimer">Disclaimer: Predictions may vary widely. Please refer to the actual numbers.</p>
+    <!-- 底部说明区域 -->
+    <footer>
+      <p>*Data source：<a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">MSU Recreational Sports and Fitness Services</a></p>
+      <p>Thanks to MSU for providing the data, this project is for personal study and time planning purposes only. <b>E-mail: zhan2374 [at] msu [dot] edu</b></p>
+      <p id="disclaimer">Disclaimer: Predictions may vary widely. Please refer to the actual numbers.</p>
+    </footer>
   </div>
   <script>
     // 固定随机种子，确保快速刷新时随机数序列一致
