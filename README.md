@@ -6,9 +6,9 @@
 首先，使用浏览器打开（[🌧Sweat Scheduler | MSU 健身房人浪预报🌊](https://charmingzh.github.io/IsItBusy/)）小程序，然后按照如下步骤可以添加到桌面，方便随时访问。
 
 <div style="display: flex; justify-content: space-between; align-items: center;">
-  <img src="docs/pic/1.jpg" alt="图片1" style="width: 25%; margin-right: 1%;">
-  <img src="docs/pic/2.jpg" alt="图片2" style="width: 25%; margin-right: 1%;">
-  <img src="docs/pic/3.jpg" alt="图片3" style="width: 25%;">
+  <img src="docs/pic/1.jpg" alt="图片1" style="width: 32%; margin-right: 1%;">
+  <img src="docs/pic/2.jpg" alt="图片2" style="width: 32%; margin-right: 1%;">
+  <img src="docs/pic/3.jpg" alt="图片3" style="width: 32%;">
 </div>
 
 <div style="text-align: center;">
@@ -25,7 +25,7 @@
 > > - 约 **21%** 的健身爱好者每次训练花费 **0.5 ~ 1** 小时；
 > > - 约 **35%** 的健身爱好者每次训练花费 **1 ~ 2** 小时；
 > <div style="text-align: center;">
-> <img src="docs/pic/normal_distribution.png" alt="Visualization of the Normal Distribution of Individual Training Time." style="width:75%;" />
+> <img src="docs/pic/normal_distribution.png" alt="Visualization of the Normal Distribution of Individual Training Time." style="width:100%;" />
 > </div>
 > 经过数值求解，本次估计得到的正态分布参数为 $N(\mu=1, \sigma=0.92^2)$ 
 > 
@@ -51,7 +51,7 @@
 > - 约 **16%** 的健身房会员在晚间 8 点至 11 点期间健身。
 
 <div style="text-align: center;">
-<img src="docs/pic/workout_time_intervals.png" alt="Visualization of the most favorite workout time." style="width:75%;" />
+<img src="docs/pic/workout_time_intervals.png" alt="Visualization of the most favorite workout time." style="width:100%;" />
 </div>
 
 # 4. MSU 健身房真实实时人数预报
