@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <!-- 保证页面在移动设备上按设备宽度显示 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spartan Gym Pulse: MSU 实时人数预测</title>
+  <!-- 引入液晶风格字体 VT323 -->
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <!-- 引入 seedrandom 库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  <style>
+    /* 使用 CSS Grid 将整个页面分为 3 个区域 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 96vh;
+      font-family: 'Arial', sans-serif;
+      background: #f4f4f9;
+      /*background: #960226;*/
+      display: grid;
+      grid-template-rows: 22vh 65vh 13vh;
+      grid-template-columns: 100%;
+    }
+    /* 顶部区域：标题、实时人数显示和关于按钮 */
+    header {
+      grid-row: 1;
+      width: 90%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    header h2 {
+      margin: 0;
+      font-size: 2rem;
+      color: #094b0a;
+      text-align: center;
+    }
+    /* 实时显示容器 */
+    #realtime-container {
+      margin-top: 15px;
+      margin-left: 20px;
+      display: flex;
+      /*justify-content: center;*/
+      gap: 20px;
+      width: 100%;
+      /*align-items: center;*/
+    }
+    .realtime-box {
+      background: #000;
+      color: #32CD32;
+      border: 4px solid #32CD32;
+      border-radius: 20px;
+      padding: 0px 2px;
+      font-family: 'VT323', monospace;
+      font-size: 3.5rem;
+      text-align: center;
+      min-width: 100px;
+      display: flex;
+      flex-direction: column;
+    }
+    .realtime-label {
+      display: block;
+      font-size: 2.5rem;
+      color: #fac5e8;  /* fff */
+    }
+    /* 优化后的关于按钮：圆形图标按钮 */
+    #about-button {
+      position: absolute;
+      top: 10px;
+      right: -35px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #fff;
+      border: 3px solid #960226;
+      color: #970623;
+      font-size: 1.5rem;
+      line-height: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+    #about-button:hover,
+    #about-button:active {
+      background: #32CD32;
+      color: #000;
+    }
+    /* 数据可视化区域 */
+    #chart {
+      grid-row: 2;
+      width: 90%;
+      max-width: 1200px;
+      height: 85%;
+      background: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      padding: 10px;
+      justify-self: center;
+      align-self: center;
+    }
+    /* 底部说明区域 */
+    #footer-info {
+      grid-row: 3;
+      width: 96%;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #555;
+      padding: 0px 10px;
+      overflow: auto;
+    }
+    #footer-info a {
+      color: #007BFF;
+      text-decoration: none;
+    }
+    #footer-info a:hover {
+      text-decoration: underline;
+    }
+    #disclaimer {
+      margin-top: 5px;
+      color: #d9534f;
+    }
+    /* 针对较小屏幕的优化 */
+    @media (max-width: 768px) {
+      header h2 {
+        font-size: 1.5rem;
+      }
+      .realtime-box {
+        font-size: 1.5rem;
+        padding: 3px 8px;
+      }
+      #about-button {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+        line-height: 35px;
+      }
+      #chart {
+        width: 95%;
+        padding: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Sweat Scheduler</h2>
+    <h2>MSU 健身房人浪预报</h2>
+    <div id="realtime-container">
+      <div class="realtime-box" id="realtime-west">
+        <span class="realtime-label">West</span>
+        <span class="realtime-count">--</span>
+      </div>
+      <div class="realtime-box" id="realtime-east">
+        <span class="realtime-label">East</span>
+        <span class="realtime-count">--</span>
+      </div>
+      <div class="realtime-box" id="realtime-circle">
+        <span class="realtime-label">Circle</span>
+        <span class="realtime-count">--</span>
+      </div>
+    </div>
+    <button id="about-button" onclick="window.open('about.html', '_blank')">ℹ</button>
+  </header>
+  <div id="chart"></div>
+  <div id="footer-info">
+    <p>*Data source：<a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">MSU Recreational Sports and Fitness Services</a>。</p>
+    <p>Thanks to MSU for providing the data, this project is for personal study and time planning purposes only, if there is any violation, please contact me and I will remove it immediately. <b>E-mail: zhan2374 [at] msu [dot] edu</b></p>
+    <p id="disclaimer">Disclaimer: Predictions may vary widely. Please refer to the actual numbers.</p>
+  </div>
+  <script>
+    // 固定随机种子，确保快速刷新时随机数序列一致
+    Math.seedrandom('fixed-seed');
+
+    // 自定义时间格式化函数，格式化为 "HH:mm"
+    function formatTime(date) {
+      const hh = date.getHours().toString().padStart(2, '0');
+      const mm = date.getMinutes().toString().padStart(2, '0');
+      return `${hh}:${mm}`;
+    }
+
+    // 生成正态随机数 (Box-Muller)
+    function randNormal(mean, stdDev) {
+      let u = 0, v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+      return z * stdDev + mean;
+    }
+
+    // 将 CSV 中的日期映射到今天（只保留时分秒）
+    function fixDateToToday(dateStr) {
+      let parts = dateStr.split(/\s+/);
+      if (parts.length < 2) return null;
+      let [yyyy_mm_dd, hhmmss] = parts;
+      let [hh, mm, ss] = hhmmss.split(":").map(Number);
+      let now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, ss);
+    }
+
+    // SG 平滑函数：使用给定卷积核对数据进行平滑处理
+    function sgSmooth(arr, kernel) {
+      let kHalf = Math.floor(kernel.length / 2);
+      let smoothed = [];
+      for (let i = 0; i < arr.length; i++) {
+        let acc = 0;
+        for (let j = 0; j < kernel.length; j++) {
+          let idx = i + j - kHalf;
+          if (idx < 0) idx = 0;
+          if (idx >= arr.length) idx = arr.length - 1;
+          acc += arr[idx] * kernel[j];
+        }
+        smoothed.push(acc);
+      }
+      return smoothed;
+    }
+
+    // 全局变量保存实时人数数据，用于更新液晶显示
+    let globalOccupancies = {
+      timeData: [],
+      westOcc: [],
+      eastOcc: [],
+      circleOcc: []
+    };
+
+    // 主流程：读取 CSV -> 解析 -> 处理 -> 可视化
+    async function loadData() {
+      try {
+        const response = await fetch("../data/today_data.csv");
+        if (!response.ok) {
+          throw new Error("Failed to fetch CSV: " + response.statusText);
+        }
+        const text = await response.text();
+        processCSV(text);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        document.getElementById("chart").innerHTML =
+          "<p style='color: red;'>Failed to load data.</p>";
+      }
+    }
+
+    // 处理 CSV 文本
+    function processCSV(csvText) {
+      const MEAN_HOURS = 0.96;
+      const STD_HOURS  = 0.226;
+      let lines = csvText.trim().split("\n");
+      let rawData = lines.map(line => {
+        let [timeStr, w, e, c] = line.split(/,\s*/);
+        if (!timeStr || w === undefined || e === undefined || c === undefined) {
+          return null;
+        }
+        let t = fixDateToToday(timeStr);
+        if (!t || isNaN(t.getTime())) return null;
+        return {
+          time: t,
+          west: Number(w),
+          east: Number(e),
+          circle: Number(c)
+        };
+      }).filter(Boolean);
+
+      if (!rawData.length) {
+        document.getElementById("chart").innerHTML =
+          "<p style='color:red;'>No valid data available.</p>";
+        return;
+      }
+
+      // 按时间升序排列
+      rawData.sort((a, b) => a.time - b.time);
+
+      // 只保留 6:00 ~ 23:00 的数据
+      let dataPoints = rawData.filter(dp => {
+        let h = dp.time.getHours();
+        return h >= 6 && h <= 23;
+      });
+      if (!dataPoints.length) {
+        document.getElementById("chart").innerHTML =
+          "<p style='color:red;'>No data in 6:00-23:00.</p>";
+        return;
+      }
+
+      // 用于可视化的时间轴和在场人数数据
+      let xAxis = [];
+      let timeData = [];
+      let westOcc = [];
+      let eastOcc = [];
+      let circleOcc = [];
+      let peopleWest = [];
+      let peopleEast = [];
+      let peopleCircle = [];
+      let prev = null;
+
+      dataPoints.forEach(dp => {
+        let currTime = dp.time;
+        if (!prev) {
+          prev = dp;
+        }
+        // 移除已离场人员（衰减）
+        peopleWest   = peopleWest.filter(p => p.exitTime > currTime);
+        peopleEast   = peopleEast.filter(p => p.exitTime > currTime);
+        peopleCircle = peopleCircle.filter(p => p.exitTime > currTime);
+
+        // 计算新进场人数（增量）
+        let dWest   = Math.max(dp.west - prev.west, 0);
+        let dEast   = Math.max(dp.east - prev.east, 0);
+        let dCircle = Math.max(dp.circle - prev.circle, 0);
+
+        for (let i = 0; i < dWest; i++) {
+          let duration = randNormal(MEAN_HOURS, STD_HOURS);
+          let exitTime = new Date(currTime.getTime() + duration * 3600000);
+          peopleWest.push({ exitTime });
+        }
+        for (let i = 0; i < dEast; i++) {
+          let duration = randNormal(MEAN_HOURS, STD_HOURS);
+          let exitTime = new Date(currTime.getTime() + duration * 3600000);
+          peopleEast.push({ exitTime });
+        }
+        for (let i = 0; i < dCircle; i++) {
+          let duration = randNormal(MEAN_HOURS, STD_HOURS);
+          let exitTime = new Date(currTime.getTime() + duration * 3600000);
+          peopleCircle.push({ exitTime });
+        }
+
+        xAxis.push(formatTime(currTime));
+        timeData.push(currTime);
+        westOcc.push(peopleWest.length);
+        eastOcc.push(peopleEast.length);
+        circleOcc.push(peopleCircle.length);
+        prev = dp;
+      });
+
+      // 保存全局数据用于实时显示
+      globalOccupancies.timeData = timeData;
+      globalOccupancies.westOcc = westOcc;
+      globalOccupancies.eastOcc = eastOcc;
+      globalOccupancies.circleOcc = circleOcc;
+
+      // 更新液晶显示
+      updateRealtimeDisplay();
+
+      // 固定卷积核：窗口长度 7，三次多项式拟合
+      const sgKernel = [-2, 3, 6, 7, 6, 3, -2].map(x => x / 21);
+      const smoothWestOcc   = sgSmooth(westOcc, sgKernel).map(v => Math.max(0, Math.floor(v)));
+      const smoothEastOcc   = sgSmooth(eastOcc, sgKernel).map(v => Math.max(0, Math.floor(v)));
+      const smoothCircleOcc = sgSmooth(circleOcc, sgKernel).map(v => Math.max(0, Math.floor(v)));
+
+      renderChart(xAxis, smoothWestOcc, smoothEastOcc, smoothCircleOcc);
+    }
+
+    // 更新实时显示：分别计算 West, East, Circle 与15分钟前的差异
+    function updateRealtimeDisplay() {
+      const timeData = globalOccupancies.timeData;
+      if (!timeData.length) return;
+      const currentIndex = timeData.length - 1;
+      const currentTime = timeData[currentIndex];
+
+      function computeDiff(arr) {
+        const currentVal = arr[currentIndex];
+        const targetTime = new Date(currentTime.getTime() - 60 * 60000);
+        let prevIndex = 0;
+        for (let i = 0; i < timeData.length; i++) {
+          if (timeData[i] <= targetTime) {
+            prevIndex = i;
+          }
+        }
+        const prevVal = arr[prevIndex];
+        return currentVal - prevVal;
+      }
+      const diffWest = computeDiff(globalOccupancies.westOcc);
+      const diffEast = computeDiff(globalOccupancies.eastOcc);
+      const diffCircle = computeDiff(globalOccupancies.circleOcc);
+
+      function updateElement(id, value, diff) {
+        let trendHTML = "";
+        if (diff > 0) {
+          trendHTML = `<span style="color: #32CD32;">▲ ${diff}</span>`;
+        } else if (diff < 0) {
+          trendHTML = `<span style="color: #d9534f;">▼ ${Math.abs(diff)}</span>`;
+        } else {
+          trendHTML = `<span>—</span>`;
+        }
+        document.getElementById(id).innerHTML =
+          `<span class="realtime-label">${id.split('-')[1]}</span><br>
+           <span class="realtime-count">${value}</span> ${trendHTML}`;
+      }
+      updateElement("realtime-west", globalOccupancies.westOcc[currentIndex], diffWest);
+      updateElement("realtime-east", globalOccupancies.eastOcc[currentIndex], diffEast);
+      updateElement("realtime-circle", globalOccupancies.circleOcc[currentIndex], diffCircle);
+    }
+
+    // 用 ECharts 进行可视化
+    function renderChart(xAxis, wData, eData, cData) {
+      if (!xAxis.length) {
+        document.getElementById("chart").innerHTML =
+          "<p style='color:red;'>No data to display.</p>";
+        return;
+      }
+      let chartDom = document.getElementById('chart');
+      chartDom.innerHTML = '';
+      let myChart = echarts.init(chartDom);
+      let option = {
+        tooltip: { trigger: 'axis' },
+        legend: {
+          data: ['West', 'East', 'Circle']
+        },
+        xAxis: {
+          type: 'category',
+          data: xAxis,
+          axisLabel: {
+            rotate: 45,
+            formatter: function(value) {
+              const parts = value.split(":");
+              return (parts.length === 2 && parts[1] === "00") ? value : "";
+            }
+          }
+        },
+        yAxis: { type: 'value' },
+        grid: {
+          left: '10%',
+          right: '10%',
+          bottom: '15%'
+        },
+        series: [
+          { name: 'West', type: 'line', smooth: true, data: wData },
+          { name: 'East', type: 'line', smooth: true, data: eData },
+          { name: 'Circle', type: 'line', smooth: true, data: cData }
+        ]
+      };
+      myChart.setOption(option);
+    }
+
+    // 页面加载后立即执行数据加载函数
+    loadData();
+  </script>
+</body>
+</html>
