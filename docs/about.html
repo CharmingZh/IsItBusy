@@ -40,6 +40,57 @@
       width: 100%;
       height: auto;
     }
+    /* 调整轮播图标题位置和层级，避免遮挡 */
+.carousel-caption {
+  bottom: 20px;         /* 根据需要调整 */
+  z-index: 10;          /* 确保标题位于图片之上 */
+  background: rgba(0, 0, 0, 0.4); /* 可选：添加半透明背景提高可读性 */
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* 自定义左右按钮的样式 */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-image: none; /* 去除默认的 svg 图标 */
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  line-height: 40px;
+  text-align: center;
+  font-size: 20px;
+  color: #fff; /* 图标颜色 */
+}
+
+/* 左边按钮设置 */
+.carousel-control-prev-icon {
+  background-color: #970623;
+}
+
+/* 右边按钮设置 */
+.carousel-control-next-icon {
+  background-color: #960226;
+}
+
+/* 使用伪元素添加左右箭头 */
+.carousel-control-prev-icon::after,
+.carousel-control-next-icon::after {
+  content: '';
+  display: inline-block;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  padding: 7px;
+}
+
+.carousel-control-prev-icon::after {
+  transform: rotate(135deg);
+}
+
+.carousel-control-next-icon::after {
+  transform: rotate(-45deg);
+}
+
   </style>
 </head>
 <body>
