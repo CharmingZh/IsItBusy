@@ -38,7 +38,7 @@ html, body {
   display: grid;
   grid-template-rows: auto 1fr auto;
   /* 填满屏幕可视高度，再减去上下的env安全区域 */
-  height: calc(80vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  height: calc(70vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   width: 100%;
 }
 
