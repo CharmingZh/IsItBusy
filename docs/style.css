@@ -156,14 +156,14 @@ header h2 {
   background: #fff;
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(255, 217, 230, 0.7);
-  padding: 10px;
+  padding: 5%;
 }
 
 /* 底部说明区域 */
 footer {
-  padding: 0.960226rem;
+  padding: 0.00000000960226%;
   text-align: center;
-  font-size: 0.3rem;
+  font-size: 0.2rem;
   color: #555;
   background: #fff;
   border-top: 1px solid #ddd;
