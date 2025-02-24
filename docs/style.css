@@ -3,28 +3,27 @@
   box-sizing: border-box;
 }
 
+/* 保证横向不溢出，纵向可滚动 */
 html, body {
-  /* 去掉 margin: 10px; 改为 0 */
-  margin: 0;
-  /* 建议保留本来的安全区域 padding */
+  margin: 0; /* 这里改为 0，避免多余外边距 */
   padding: env(safe-area-inset-top) env(safe-area-inset-right)
            env(safe-area-inset-bottom) env(safe-area-inset-left);
-  height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  height: 100%; /* 如果不需要全屏也可以去掉 */
   font-family: 'Arial', sans-serif;
-  /*font-family: 'VT323', monospace;*/
   font-size: 17px;
   background: #f4f4f9;
-  /* 如果你希望页面可以在内容过长时竖向滚动，可以改为 overflow-y: auto; */
-  overflow-x: hidden; /* 避免横向滚动 */
-  overflow-y: auto;   /* 允许垂直滚动 */
+  overflow-x: hidden; /* 禁止水平滚动 */
+  overflow-y: auto;   /* 保留垂直滚动 */
 }
 
 /* 整体页面容器采用 Grid 布局 */
+/* 如果想让它尽量撑满屏，可以用 min-height: 100%; 或 calc(100vh - safe-area) */
 .main-container {
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 85%;
-  /* 如果想让内容随屏幕自适应，也可以用 min-height: calc(100vh - 一些padding) */
 }
 
 /* 顶部区域：标题、实时数据和关于按钮 */
@@ -110,17 +109,17 @@ header h2 {
 
 .realtime-indicator-up {
   font-family: 'Doto', sans-serif;
-  color: #d9534f;
+  color: #d9534f ;
   font-size: 1.2rem;
 }
 
 .realtime-indicator-down {
   font-family: 'Doto', sans-serif;
-  color: #32CD32;
+  color: #32CD32 ;
   font-size: 1.25rem;
 }
 
-/* 关于按钮 */
+/* 关于按钮：将过大的 font-size 降低，避免撑宽 */
 #about-button {
   position: absolute;
   top: 0.5rem;
@@ -131,7 +130,8 @@ header h2 {
   background: #fff;
   border: 2px solid #960226;
   color: #970623;
-  font-size: 3.5rem;
+  /* 原本是 3.5rem，这里改小一点防止超出 */
+  font-size: 2rem;
   line-height: 35px;
   text-align: center;
   cursor: pointer;
@@ -168,7 +168,6 @@ footer {
   background: #fff;
   border-top: 1px solid #ddd;
   border-radius: 26px;
-  /*box-shadow: 0 4px 8px rgba(144, 238, 144, 0.7);*/
   overflow: auto;
 }
 
