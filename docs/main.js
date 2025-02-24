@@ -382,7 +382,8 @@ function renderChart(xAxis, wData, eData, cData) {
       type: 'category',
       data: xAxis,
       axisLabel: {
-        rotate: 45,
+        fontSize: 10,  // 这里调整 X 轴刻度字体大小
+        rotate: 30,
         formatter: function(value) {
           // 只在 showTimes 列表中才显示
           return showTimes.includes(value) ? value : '';

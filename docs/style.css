@@ -86,26 +86,26 @@ header h2 {
 }
 
 .realtime-label {
-  font-size: 2rem; /* 调小一些 */
+  font-size: 3rem; /* 调小一些 */
   color: #00ffc4;
   margin-bottom: -17px;
 }
 
 .realtime-count {
   font-family: 'Doto', sans-serif;
-  font-size: 2rem; /* 调小一些 */
+  font-size: 2.5rem; /* 调小一些 */
 }
 
 .realtime-indicator-up {
   font-family: 'Doto', sans-serif;
   color: #d9534f;
-  font-size: 1.25rem;
+  font-size: 0.75rem;
 }
 
 .realtime-indicator-down {
   font-family: 'Doto', sans-serif;
   color: #32CD32;
-  font-size: 1.25rem;
+  font-size: 0.75rem;
 }
 
 /* 小角标的通用样式：字体较小，带点内边距和圆角 */
