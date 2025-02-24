@@ -1,20 +1,22 @@
 /* 全局盒模型和安全区域 */
-
-
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
 html, body {
-  margin: 10px;
-  /* 使用安全区域变量，确保内容不被刘海、状态栏和底部手势区域遮挡 */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  /* 去掉 margin: 10px; 改为 0 */
+  margin: 0;
+  /* 建议保留本来的安全区域 padding */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+           env(safe-area-inset-bottom) env(safe-area-inset-left);
   height: 100vh;
   font-family: 'Arial', sans-serif;
   /*font-family: 'VT323', monospace;*/
   font-size: 17px;
   background: #f4f4f9;
-  overflow: hidden;
+  /* 如果你希望页面可以在内容过长时竖向滚动，可以改为 overflow-y: auto; */
+  overflow-x: hidden; /* 避免横向滚动 */
+  overflow-y: auto;   /* 允许垂直滚动 */
 }
 
 /* 整体页面容器采用 Grid 布局 */
@@ -22,6 +24,7 @@ html, body {
   display: grid;
   grid-template-rows: auto 1fr auto;
   height: 85%;
+  /* 如果想让内容随屏幕自适应，也可以用 min-height: calc(100vh - 一些padding) */
 }
 
 /* 顶部区域：标题、实时数据和关于按钮 */
@@ -107,13 +110,13 @@ header h2 {
 
 .realtime-indicator-up {
   font-family: 'Doto', sans-serif;
-  color: #d9534f ;
+  color: #d9534f;
   font-size: 1.2rem;
 }
 
 .realtime-indicator-down {
   font-family: 'Doto', sans-serif;
-  color: #32CD32 ;
+  color: #32CD32;
   font-size: 1.25rem;
 }
 
