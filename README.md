@@ -1,3 +1,9 @@
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+   <img src="docs/output_images/09_integration_by_year_2025.png" alt="图片2" style="width: 74%; margin-right: 0%;"> 
+ <img src="docs/pic/demo.png" alt="图片2" style="width: 21%; margin-right: 0%;">
+</div>
+<center>Viz of 2025 Data and Runtime Demo.</center>
 本项目通过在服务端爬取 MSU 健身房实时人数数据（时间粒度五分钟，多了阿里云要炸），对当前人数进行了预测。人数衰减量我们默认个体的单次健身时长遵循正态分布。
 具体来说，我们通过参考了“美国成年人健身房训练时长统计分析”的数据，并对其拟合了概率密度函数（具体实现过程[参考](https://charmingzh.github.io/IsItBusy/about.html)）。
 
