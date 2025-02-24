@@ -45,7 +45,7 @@ header {
 
 header h2 {
   margin: 0.2rem 0;
-  font-size: 1.5rem; /* 适当调小标题，避免过高 */
+  font-size: 1.2rem; /* 适当调小标题，避免过高 */
   color: #094b0a;
 }
 
@@ -53,8 +53,8 @@ header h2 {
 #realtime-container {
   display: flex;
   justify-content: center;
-  gap: 5px;          /* 缩小间隔 */
-  height: 60px;      /* 适当调小高度 */
+  gap: 15px;          /* 缩小间隔 */
+  height: 55px;      /* 适当调小高度 */
   margin-top: 0.3rem;
 }
 
@@ -69,7 +69,7 @@ header h2 {
   font-family: 'VT323', monospace;
   font-size: 1rem;   /* 适当调小字体 */
   text-align: center;
-  min-width: 80px;   /* 控制盒子最小宽度 */
+  min-width: 100px;   /* 控制盒子最小宽度 */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -86,32 +86,32 @@ header h2 {
 }
 
 .realtime-label {
-  font-size: 1.6rem; /* 调小一些 */
+  font-size: 2rem; /* 调小一些 */
   color: #00ffc4;
-  margin-bottom: -10px;
+  margin-bottom: -17px;
 }
 
 .realtime-count {
   font-family: 'Doto', sans-serif;
-  font-size: 1.6rem; /* 调小一些 */
+  font-size: 2rem; /* 调小一些 */
 }
 
 .realtime-indicator-up {
   font-family: 'Doto', sans-serif;
   color: #d9534f;
-  font-size: 0.8rem;
+  font-size: 1.25rem;
 }
 
 .realtime-indicator-down {
   font-family: 'Doto', sans-serif;
   color: #32CD32;
-  font-size: 0.8rem;
+  font-size: 1.25rem;
 }
 
 /* 小角标的通用样式：字体较小，带点内边距和圆角 */
 .realtime-status-badge {
   display: inline-block;
-  font-size: 0.7rem;       /* 根据需要可调小或更小 */
+  font-size: 0.5rem;       /* 根据需要可调小或更小 */
   margin-left: 0.3rem;     /* 与数字之间留一点距离 */
   padding: 0.1rem 0.2rem;
   border-radius: 5px;      /* 让角标有个圆角 */
@@ -187,11 +187,11 @@ footer {
   text-align: center;
   font-size: 0.6rem; /* 缩小字体，给中间区更多空间 */
   color: #555;
-  background: #fff;
-  border-top: 1px solid #ddd;
-  border-radius: 26px;
+  background: #f6fff3;
+  /*border-top: 0px solid #ddd;*/
+  border-radius: 0px;
   padding: 0.3rem 0.2rem;
-  box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+  /*box-shadow: 0 -2px 4px rgba(0,0,0,0.05);*/
 }
 
 .disclaimer {
