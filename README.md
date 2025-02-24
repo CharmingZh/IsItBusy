@@ -54,6 +54,7 @@
 <div style="text-align: center;">
 <img src="docs/pic/workout_time_intervals.png" alt="Visualization of the most favorite workout time." style="width:100%;" />
 </div>
+<center><sup>[2]</sup>Visualization of the most favorite workout time.</center>
 
 # 4. MSU 健身房真实实时人数预报
 
@@ -63,6 +64,7 @@
   <img src="docs/output_images/09_integration_by_year_2024.png" alt="图片1" style="width: 49%; margin-right: 1%;">
   <img src="docs/output_images/09_integration_by_year_2025.png" alt="图片2" style="width: 49%; margin-right: 1%;">
 </div>
+<center><sup>[3]</sup>Visualization of the Normal Distribution of Individual Training Time.</center>
 
 
 ## 4.2 不同年份特定日期的实时人数分布
