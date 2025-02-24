@@ -189,7 +189,7 @@ function updateRealtimeDisplay() {
 
   function computeDiff(arr) {
     const currentVal = arr[currentIndex];
-    const targetTime = new Date(currentTime.getTime() - 15 * 60000);
+    const targetTime = new Date(currentTime.getTime() - 5 * 60000);
     let prevIndex = 0;
     for (let i = 0; i < timeData.length; i++) {
       if (timeData[i] <= targetTime) {
@@ -207,12 +207,12 @@ function updateRealtimeDisplay() {
     let trendHTML = "";
     if (diff > 0) {
       // trendHTML = `<span style="color: #32CD32;">▲ ${diff}</span>`;
-      trendHTML = `<span class=realtime-indicator-up>+${diff}</span>`;
+      trendHTML = `<span class=realtime-indicator-up>▲${diff}</span>`;
     } else if (diff < 0) {
       // trendHTML = `<span style="color: #d9534f;">▼ ${Math.abs(diff)}</span>`;
-      trendHTML = `<span class=realtime-indicator-down>-${Math.abs(diff)}</span>`;
+      trendHTML = `<span class=realtime-indicator-down>▼${Math.abs(diff)}</span>`;
     } else {
-      trendHTML = `<span>—</span>`;
+      trendHTML = `<span></span>`;
     }
     document.getElementById(id).innerHTML =
       `<span class="realtime-label">${id.split('-')[1]}</span><br>
@@ -248,9 +248,9 @@ function renderChart(xAxis, wData, eData, cData) {
   // 需要在轴标签上显示的时间点：
   const showTimes = ['06:00','09:00','12:00', '15:00','18:00','21:00','22:00','23:00'];
   // 同理，如果 showTimes 不包含当前时间，也插入
-  if (!showTimes.includes(now)) {
-    showTimes.push(now);
-  }
+  // if (!showTimes.includes(now)) {
+  //   showTimes.push(now);
+  // }
 
   let option = {
     tooltip: { trigger: 'axis' },

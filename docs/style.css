@@ -62,7 +62,7 @@ header h2 {
   display: flex;
   justify-content: center;
   gap: 7px;
-  height: 110px;
+  height: 70px;
   margin-top: 0.5rem;
 }
 
@@ -101,19 +101,19 @@ header h2 {
 
 .realtime-count {
   font-family: 'Doto', sans-serif;
-  font-size: 2.25rem;
+  font-size: 2.75rem;
 }
 
 .realtime-indicator-up {
   font-family: 'Doto', sans-serif;
   color: #d9534f;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 .realtime-indicator-down {
   font-family: 'Doto', sans-serif;
   color: #32CD32;
-  font-size: 1.25rem;
+  font-size: 1rem;
 }
 
 /* ========== 关于按钮 ========== */
@@ -151,7 +151,7 @@ header h2 {
   background: #fff;
 
   /* 为防止图表缩到最小，可以给它一些最小高度（可选） */
-  /* min-height: 200px;  */
+   min-height: 30%;
 }
 
 #chart {
@@ -175,6 +175,10 @@ footer {
   padding: 0.3rem;
   /* 让footer高度自适应 */
   box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+}
+
+.disclaimer {
+  color: #960226;
 }
 
 /* 针对较小屏幕的调整(可根据需求精细调参) */
