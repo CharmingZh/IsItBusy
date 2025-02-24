@@ -1,50 +1,43 @@
-/* ========== 全局盒模型和安全区域 ========== */
-*, *::before, *::after {
+/* ========== 全局盒模型 ========== */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 /*
-   让页面占满整个屏幕高度，并使用安全区域，避免iPhone刘海和底部Home Bar遮挡。
-   同时保留竖向滚动 auto, 以便在 iPhone Safari 下触发下拉刷新。
+   1. 移除 body 的 height:100% 和 overflow:auto，避免额外滚动。
+   2. 保持安全区域的基础，可以在 main-container 中设置。
 */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
-
-  /* 保留竖向滚动，iOS Safari可下拉刷新 */
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* iOS 回弹效果 */
-
+  background: #f4f4f9;
   font-family: 'Arial', sans-serif;
   font-size: 17px;
-  background: #f4f4f9;
+  overflow: hidden; /* 取消滚动，让整个页面完全卡在一屏 */
+}
 
-  /* 让安全区域内边距自行加到可滚动区域里 */
+/*
+   让主容器填满屏幕可用高度 (100dvh)，
+   同时利用安全区域内边距避免刘海、底部遮挡。
+*/
+.main-container {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  /* 动态视口高度 + 安全区域内边距 */
+  height: 100dvh;
   padding-top: env(safe-area-inset-top);
   padding-right: env(safe-area-inset-right);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
 }
 
-/*
-   主容器采用Grid：
-   行：header(自适应高度) + 中间内容(1fr) + footer(自适应高度)
-   高度设为100vh(减去安全区域)，以在一屏内显示并让中间区最大化。
-*/
-.main-container {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  /* 填满屏幕可视高度，再减去上下的env安全区域 */
-  height: calc(70vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  width: 100%;
-}
-
 /* ========== 顶部区域 header ========== */
 header {
-  padding: 0.5rem;
+  padding: 0.3rem; /* 缩小一点默认间距，确保一屏放下 */
   text-align: center;
   position: relative;
   background: #f4f4f9;
@@ -53,7 +46,7 @@ header {
 
 header h2 {
   margin: 0.2rem 0;
-  font-size: 2rem;
+  font-size: 1.5rem; /* 适当调小标题，避免过高 */
   color: #094b0a;
 }
 
@@ -61,9 +54,9 @@ header h2 {
 #realtime-container {
   display: flex;
   justify-content: center;
-  gap: 7px;
-  height: 70px;
-  margin-top: 0.5rem;
+  gap: 5px;          /* 缩小间隔 */
+  height: 60px;      /* 适当调小高度 */
+  margin-top: 0.3rem;
 }
 
 .realtime-box-west,
@@ -73,11 +66,11 @@ header h2 {
   color: #32CD32;
   border: 3px solid #58076E;
   border-radius: 17px;
-  padding: 0.3rem 0.2rem;
+  padding: 0.2rem 0.3rem;
   font-family: 'VT323', monospace;
-  font-size: 1.25rem;
+  font-size: 1rem;   /* 适当调小字体 */
   text-align: center;
-  min-width: 100px;
+  min-width: 80px;   /* 控制盒子最小宽度 */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -94,41 +87,41 @@ header h2 {
 }
 
 .realtime-label {
-  font-size: 2.75rem;
+  font-size: 1.6rem; /* 调小一些 */
   color: #fac5e8;
-  margin-bottom: -15px;
+  margin-bottom: -10px;
 }
 
 .realtime-count {
   font-family: 'Doto', sans-serif;
-  font-size: 2.75rem;
+  font-size: 1.6rem; /* 调小一些 */
 }
 
 .realtime-indicator-up {
   font-family: 'Doto', sans-serif;
   color: #d9534f;
-  font-size: 1rem;
+  font-size: 0.8rem;
 }
 
 .realtime-indicator-down {
   font-family: 'Doto', sans-serif;
   color: #32CD32;
-  font-size: 1rem;
+  font-size: 0.8rem;
 }
 
 /* ========== 关于按钮 ========== */
 #about-button {
   position: absolute;
-  top: 0.5rem;
-  right: 0.8rem;
-  width: 35px;
-  height: 35px;
+  top: 0.3rem;
+  right: 0.5rem;
+  width: 30px;
+  height: 30px;
   border-radius: 26%;
   background: #fff;
   border: 2px solid #960226;
   color: #970623;
-  font-size: 2rem; /* 避免过大导致撑宽 */
-  line-height: 35px;
+  font-size: 1.2rem;
+  line-height: 28px;
   text-align: center;
   cursor: pointer;
   transition: background 0.3s, color 0.3s;
@@ -140,40 +133,41 @@ header h2 {
   color: #000;
 }
 
-/* ========== 中间内容区域：图表区域 ========== */
-/* 占据 1fr 行 */
+/* ========== 中间内容区域 ========== */
 .content {
-  /* 在Grid中，让此区占用中间可伸缩的空间 */
+  /* 在Grid中，此区占用中间可伸缩的空间 */
   width: 100%;
-  /* 若要查看超出部分时滚动，可加 overflow-y: auto;
-     但你表示“一页内显示完毕”，所以这里不强制滚动 */
-  padding: 0.5rem;
+  /* 去掉min-height，避免撑高导致滚动 */
+  /* min-height: 500px;  <-- 移除或改小 */
   background: #fff;
-
-  /* 为防止图表缩到最小，可以给它一些最小高度（可选） */
-   min-height: 500px;
+  padding: 0.5rem;
+  /* 若要让内部内容（如图表）自适应高度，可以使用 flex */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; /* 让图表居中 */
 }
 
 #chart {
   width: 100%;
-  /* 让图表随父容器拉伸 */
-  height: 100%;
+  /* 根据中间区域自适应 */
+  flex: 1;
   background: #fff;
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(255, 217, 230, 0.7);
-  padding: 5%; /* 可自行调大或调小 */
+  padding: 5%;
+  /* 如果要最大化图表，可在这里进一步调小内边距 */
 }
 
 /* ========== 底部说明区域 footer ========== */
 footer {
   text-align: center;
-  font-size: 0.2rem;
+  font-size: 0.6rem; /* 缩小字体，给中间区更多空间 */
   color: #555;
   background: #fff;
   border-top: 1px solid #ddd;
   border-radius: 26px;
-  padding: 0.3rem;
-  /* 让footer高度自适应 */
+  padding: 0.3rem 0.2rem;
   box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
 }
 
@@ -181,24 +175,22 @@ footer {
   color: #960226;
 }
 
-/* 针对较小屏幕的调整(可根据需求精细调参) */
+/* ========== 小屏幕自适应 ========== */
 @media (max-width: 768px) {
   header h2 {
     font-size: 1.2rem;
   }
-  .realtime-label {
-    font-size: 1.8rem;
-  }
+  .realtime-label,
   .realtime-count {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
   #about-button {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     font-size: 1rem;
-    line-height: 30px;
+    line-height: 25px;
   }
   footer {
-    font-size: 0.6rem;
+    font-size: 0.5rem;
   }
 }
