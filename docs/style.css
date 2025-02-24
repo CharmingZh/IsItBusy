@@ -151,7 +151,7 @@ header h2 {
   background: #fff;
 
   /* 为防止图表缩到最小，可以给它一些最小高度（可选） */
-   min-height: 400px;
+   min-height: 1000px;
 }
 
 #chart {
