@@ -227,6 +227,10 @@ function renderChart(xAxis, wData, eData, cData) {
   let chartDom = document.getElementById('chart');
   chartDom.innerHTML = '';
   let myChart = echarts.init(chartDom);
+
+  // 需要在轴标签上显示的时间点：
+  const showTimes = ['06:00','09:00','12:00','15:00','18:00','21:00','23:00'];
+
   let option = {
     tooltip: { trigger: 'axis' },
     legend: {
@@ -236,10 +240,11 @@ function renderChart(xAxis, wData, eData, cData) {
       type: 'category',
       data: xAxis,
       axisLabel: {
+        // 可根据需要旋转角度
         rotate: 45,
         formatter: function(value) {
-          const parts = value.split(":");
-          return (parts.length === 2 && parts[1] === "00") ? value : "";
+          // 如果 value 在 showTimes 列表里，就显示，否则返回空字符串
+          return showTimes.includes(value) ? value : '';
         }
       }
     },
@@ -257,6 +262,7 @@ function renderChart(xAxis, wData, eData, cData) {
   };
   myChart.setOption(option);
 }
+
 
 // 页面加载后立即执行数据加载函数
 loadData();
