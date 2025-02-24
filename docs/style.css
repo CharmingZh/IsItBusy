@@ -76,18 +76,18 @@ header h2 {
 }
 
 .realtime-box-west {
-  box-shadow: 0 4px 4px rgba(84, 112, 198, 1);
+  box-shadow: 0 4px 4px rgba(242,162,162, 1.5);
 }
 .realtime-box-circle {
-  box-shadow: 0 4px 4px rgba(151, 207, 125, 1);
+  box-shadow: 0 4px 4px rgba(181,232,188, 1.5);
 }
 .realtime-box-east {
-  box-shadow: 0 4px 4px rgba(250, 200, 88, 1);
+  box-shadow: 0 4px 4px rgba(197,170,255, 1.5);
 }
 
 .realtime-label {
   font-size: 1.6rem; /* 调小一些 */
-  color: #fac5e8;
+  color: #00ffc4;
   margin-bottom: -10px;
 }
 
@@ -137,8 +137,8 @@ header h2 {
   position: absolute;
   top: 0.3rem;
   right: 0.5rem;
-  width: 30px;
-  height: 30px;
+  /*width: 10px;*/
+  /*height: 10px;*/
   border-radius: 26%;
   background: rgba(150, 2, 38, 0.1);
   border: 2px solid #960226;
@@ -152,7 +152,7 @@ header h2 {
 
 #about-button:hover,
 #about-button:active {
-  background: #32CD32;
+  background: #88f8dd;
   color: #000;
 }
 
@@ -177,7 +177,7 @@ header h2 {
   flex: 1;
   background: #fff;
   border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(255, 217, 230, 0.7);
+  box-shadow: 0 4px 16px rgba(255, 217, 230, 1.5);
   padding: 5%;
   /* 如果要最大化图表，可在这里进一步调小内边距 */
 }
