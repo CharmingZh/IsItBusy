@@ -61,6 +61,10 @@ async function loadData() {
     }
     const text = await response.text();
     processCSV(text);
+    const now = new Date();
+    document.getElementById('last-update').innerText =
+      now.getHours().toString().padStart(2, '0') + ':' +
+      now.getMinutes().toString().padStart(2, '0');
   } catch (err) {
     console.error("Error fetching data:", err);
     document.getElementById("chart").innerHTML =
@@ -202,15 +206,17 @@ function updateRealtimeDisplay() {
   function updateElement(id, value, diff) {
     let trendHTML = "";
     if (diff > 0) {
-      trendHTML = `<span style="color: #32CD32;">▲ ${diff}</span>`;
+      // trendHTML = `<span style="color: #32CD32;">▲ ${diff}</span>`;
+      trendHTML = `<span class=realtime-indicator-up>+${diff}</span>`;
     } else if (diff < 0) {
-      trendHTML = `<span style="color: #d9534f;">▼ ${Math.abs(diff)}</span>`;
+      // trendHTML = `<span style="color: #d9534f;">▼ ${Math.abs(diff)}</span>`;
+      trendHTML = `<span class=realtime-indicator-down>-${Math.abs(diff)}</span>`;
     } else {
       trendHTML = `<span>—</span>`;
     }
     document.getElementById(id).innerHTML =
       `<span class="realtime-label">${id.split('-')[1]}</span><br>
-       <span class="realtime-count">${value}</span> ${trendHTML}`;
+       <span class="realtime-count">${value}${trendHTML}</span> `;
   }
   updateElement("realtime-west", globalOccupancies.westOcc[currentIndex], diffWest);
   updateElement("realtime-east", globalOccupancies.eastOcc[currentIndex], diffEast);
@@ -228,8 +234,23 @@ function renderChart(xAxis, wData, eData, cData) {
   chartDom.innerHTML = '';
   let myChart = echarts.init(chartDom);
 
+  // 当前时间字符串，如 "17:02"
+  const now = formatTime(new Date());
+
+  // 如果 xAxis 里还没有当前时间，则插入
+  if (!xAxis.includes(now)) {
+    xAxis.push(now);
+    // 如果需要保持时间升序，可以再排序一次
+    // 不过要注意排序后和 wData / eData / cData 的对应关系
+    // 这里为尽量少改动，暂不排序
+  }
+
   // 需要在轴标签上显示的时间点：
-  const showTimes = ['06:00','09:00','12:00','15:00','18:00','21:00','23:00'];
+  const showTimes = ['06:00','09:00','12:00', '15:00','18:00','21:00','22:00','23:00'];
+  // 同理，如果 showTimes 不包含当前时间，也插入
+  if (!showTimes.includes(now)) {
+    showTimes.push(now);
+  }
 
   let option = {
     tooltip: { trigger: 'axis' },
@@ -240,10 +261,9 @@ function renderChart(xAxis, wData, eData, cData) {
       type: 'category',
       data: xAxis,
       axisLabel: {
-        // 可根据需要旋转角度
         rotate: 45,
         formatter: function(value) {
-          // 如果 value 在 showTimes 列表里，就显示，否则返回空字符串
+          // 如果 value 在 showTimes 列表里，就显示，否则返回空
           return showTimes.includes(value) ? value : '';
         }
       }
@@ -257,11 +277,31 @@ function renderChart(xAxis, wData, eData, cData) {
     series: [
       { name: 'West',   type: 'line', smooth: true, data: wData },
       { name: 'East',   type: 'line', smooth: true, data: eData },
-      { name: 'Circle', type: 'line', smooth: true, data: cData }
+      {
+        name: 'Circle',
+        type: 'line',
+        smooth: true,
+        data: cData,
+        // 在最后一个系列中添加一条垂直虚线 markLine
+        markLine: {
+          symbol: 'none', // 不显示端点标记
+          lineStyle: {
+            type: 'dashed',
+            color: '#f68181'
+          },
+          data: [
+            // 使用 xAxis 属性，在 x 轴 = now 处画一条竖线
+            { xAxis: now }
+          ]
+        }
+      }
     ]
   };
+
   myChart.setOption(option);
 }
+
+
 
 
 // 页面加载后立即执行数据加载函数

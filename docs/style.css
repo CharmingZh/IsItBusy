@@ -1,14 +1,18 @@
 /* 全局盒模型和安全区域 */
+
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
 html, body {
-  margin: ;
+  margin: 10px;
   /* 使用安全区域变量，确保内容不被刘海、状态栏和底部手势区域遮挡 */
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   height: 100vh;
   font-family: 'Arial', sans-serif;
+  /*font-family: 'VT323', monospace;*/
+  font-size: 17px;
   background: #f4f4f9;
   overflow: hidden;
 }
@@ -25,8 +29,8 @@ header {
   padding: 0.5rem;
   text-align: center;
   position: relative;
-  background: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  background: #f4f4f9;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.0);
 }
 
 header h2 {
@@ -39,42 +43,92 @@ header h2 {
 #realtime-container {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 7px;
+  height: 110px;
   margin-top: 0.5rem;
 }
 
-.realtime-box {
+.realtime-box-west {
   background: #000;
   color: #32CD32;
-  border: 4px solid #32CD32;
-  border-radius: 20px;
+  border: 3px solid #58076E;
+  border-radius: 17px;
   padding: 0.3rem 0.2rem;
   font-family: 'VT323', monospace;
-  font-size: 2.5rem;
+  font-size: 1.25rem;
   text-align: center;
   min-width: 100px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  box-shadow: 0 4px 4px rgba(84, 112, 198, 1);
+}
+.realtime-box-circle {
+  background: #000;
+  color: #32CD32;
+  border: 3px solid #58076E;
+  border-radius: 17px;
+  padding: 0.3rem 0.2rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.25rem;
+  text-align: center;
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 4px 4px rgba(151,207,125, 1);
+}
+.realtime-box-east {
+  background: #000;
+  color: #32CD32;
+  border: 3px solid #58076E;
+  border-radius: 17px;
+  padding: 0.3rem 0.2rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.25rem;
+  text-align: center;
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 4px 4px rgba(250,200,88, 1);
 }
 
 .realtime-label {
-  font-size: 2.5rem;
+  font-size: 2.75rem;
   color: #fac5e8;
+  margin-bottom: -15px;
+}
+
+.realtime-count {
+  font-family: 'Doto', sans-serif;
+  font-size: 2.25rem;
+}
+
+.realtime-indicator-up {
+  font-family: 'Doto', sans-serif;
+  color: #d9534f ;
+  font-size: 1.2rem;
+}
+
+.realtime-indicator-down {
+  font-family: 'Doto', sans-serif;
+  color: #32CD32 ;
+  font-size: 1.25rem;
 }
 
 /* 关于按钮 */
 #about-button {
   position: absolute;
   top: 0.5rem;
-  right: 2.5rem;
+  right: 0.8rem;
   width: 35px;
-  height: 5px;
-  border-radius: 50%;
+  height: 35px;
+  border-radius: 26%;
   background: #fff;
   border: 2px solid #960226;
   color: #970623;
-  font-size: 1.2rem;
+  font-size: 3.5rem;
   line-height: 35px;
   text-align: center;
   cursor: pointer;
@@ -98,7 +152,7 @@ header h2 {
   height: 100%;
   background: #fff;
   border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(255, 217, 230, 0.7);
   padding: 10px;
 }
 
@@ -106,11 +160,12 @@ header h2 {
 footer {
   padding: 0.960226rem;
   text-align: center;
-  font-size: 0.7rem;
+  font-size: 0.3rem;
   color: #555;
   background: #fff;
   border-top: 1px solid #ddd;
-  border-radius: 10%;
+  border-radius: 26px;
+  /*box-shadow: 0 4px 8px rgba(144, 238, 144, 0.7);*/
   overflow: auto;
 }
 
