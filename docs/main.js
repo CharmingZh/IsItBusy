@@ -1,14 +1,23 @@
-// 固定随机种子，确保快速刷新时随机数序列一致
+/*********************************************
+ * main.js
+ * 集成营业时间可视化 + 原有功能优化
+ *********************************************/
+
+// 固定随机种子，确保刷新时随机数序列一致
 Math.seedrandom('fixed-seed');
 
-// 自定义时间格式化函数，格式化为 "HH:mm"
+/**
+ * 自定义时间格式化函数，返回 "HH:mm"
+ */
 function formatTime(date) {
   const hh = date.getHours().toString().padStart(2, '0');
   const mm = date.getMinutes().toString().padStart(2, '0');
   return `${hh}:${mm}`;
 }
 
-// 生成正态随机数 (Box-Muller)
+/**
+ * 生成正态随机数 (Box-Muller)
+ */
 function randNormal(mean, stdDev) {
   let u = 0, v = 0;
   while (u === 0) u = Math.random();
@@ -17,17 +26,22 @@ function randNormal(mean, stdDev) {
   return z * stdDev + mean;
 }
 
-// 将 CSV 中的日期映射到今天（只保留时分秒）
+/**
+ * 将 CSV 中的日期映射到今天（仅保留时分秒）
+ * 形如 "2023-01-01 07:30:00" -> 今日 07:30:00
+ */
 function fixDateToToday(dateStr) {
   let parts = dateStr.split(/\s+/);
   if (parts.length < 2) return null;
-  let [yyyy_mm_dd, hhmmss] = parts;
+  let [_, hhmmss] = parts; // 只要时分秒部分
   let [hh, mm, ss] = hhmmss.split(":").map(Number);
   let now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, ss);
 }
 
-// SG 平滑函数：使用给定卷积核对数据进行平滑处理
+/**
+ * SG 平滑函数：使用给定卷积核对数据进行平滑
+ */
 function sgSmooth(arr, kernel) {
   let kHalf = Math.floor(kernel.length / 2);
   let smoothed = [];
@@ -44,7 +58,54 @@ function sgSmooth(arr, kernel) {
   return smoothed;
 }
 
-// 全局变量保存实时人数数据，用于更新液晶显示
+/**
+ * 判断 IM West/East 是否在给定时间营业
+ * 根据你提供的表：
+ *  - Mon-Fri: 6am - 11pm
+ *  - Sat: 10am - 9pm
+ *  - Sun: 10am - 10pm
+ */
+function isOpenWestEast(dateObj) {
+  const day = dateObj.getDay();   // 0=周日,1=周一,...,6=周六
+  const hour = dateObj.getHours();
+  // Sunday (day = 0): 10am - 10pm
+  if (day === 0) {
+    return hour >= 10 && hour < 22;
+  }
+  // Saturday (day = 6): 10am - 9pm
+  if (day === 6) {
+    return hour >= 10 && hour < 21;
+  }
+  // Mon-Fri (day=1..5): 6am - 11pm
+  return hour >= 6 && hour < 23;
+}
+
+/**
+ * 判断 IM Circle 是否在给定时间营业
+ *  - Monday-Thu: 7am - 10pm
+ *  - Friday:     7am - 8pm
+ *  - Sat-Sun:    12pm - 5pm
+ */
+function isOpenCircle(dateObj) {
+  const day = dateObj.getDay();   // 0=Sun,6=Sat
+  const hour = dateObj.getHours();
+
+  // Mon-Thu
+  if (day >= 1 && day <= 4) {
+    return hour >= 7 && hour < 22;
+  }
+  // Friday
+  if (day === 5) {
+    return hour >= 7 && hour < 20;
+  }
+  // Sat + Sun
+  if (day === 6 || day === 0) {
+    return hour >= 12 && hour < 17;
+  }
+  return false;
+}
+
+// 全局变量：保存实时人数数据 (时间序列)，用于更新液晶显示
 let globalOccupancies = {
   timeData: [],
   westOcc: [],
@@ -52,7 +113,9 @@ let globalOccupancies = {
   circleOcc: []
 };
 
-// 主流程：读取 CSV -> 解析 -> 处理 -> 可视化
+/**
+ * 入口函数：读取 CSV -> 解析 -> 处理 -> 可视化
+ */
 async function loadData() {
   try {
     const response = await fetch("https://raw.githubusercontent.com/CharmingZh/gym_data_repo/refs/heads/main/data/today_data.csv");
@@ -61,10 +124,11 @@ async function loadData() {
     }
     const text = await response.text();
     processCSV(text);
+
+    // 更新 "last-update" 显示
     const now = new Date();
     document.getElementById('last-update').innerText =
-      now.getHours().toString().padStart(2, '0') + ':' +
-      now.getMinutes().toString().padStart(2, '0');
+      formatTime(now); // 比如 "17:05"
   } catch (err) {
     console.error("Error fetching data:", err);
     document.getElementById("chart").innerHTML =
@@ -72,11 +136,15 @@ async function loadData() {
   }
 }
 
-// 处理 CSV 文本
+/**
+ * 解析并处理 CSV 文本
+ */
 function processCSV(csvText) {
-  const MEAN_HOURS = 1.00;
+  const MEAN_HOURS = 1.0;
   const STD_HOURS  = 0.4;
   let lines = csvText.trim().split("\n");
+
+  // 解析每行，得到时间 + (west,east,circle)
   let rawData = lines.map(line => {
     let [timeStr, w, e, c] = line.split(/,\s*/);
     if (!timeStr || w === undefined || e === undefined || c === undefined) {
@@ -92,16 +160,17 @@ function processCSV(csvText) {
     };
   }).filter(Boolean);
 
+  // 若无有效数据
   if (!rawData.length) {
     document.getElementById("chart").innerHTML =
       "<p style='color:red;'>No valid data available.</p>";
     return;
   }
 
-  // 按时间升序排列
+  // 按时间升序
   rawData.sort((a, b) => a.time - b.time);
 
-  // 只保留 6:00 ~ 23:00 的数据
+  // 只保留 6:00 ~ 23:00 的数据（如果你只想显示这一段）
   let dataPoints = rawData.filter(dp => {
     let h = dp.time.getHours();
     return h >= 6 && h <= 23;
@@ -112,12 +181,14 @@ function processCSV(csvText) {
     return;
   }
 
-  // 用于可视化的时间轴和在场人数数据
+  // 用于构建在场人数的时间序列
   let xAxis = [];
   let timeData = [];
   let westOcc = [];
   let eastOcc = [];
   let circleOcc = [];
+
+  // 用来跟踪“在场人员”的数组(随机生成离场时间)
   let peopleWest = [];
   let peopleEast = [];
   let peopleCircle = [];
@@ -125,21 +196,21 @@ function processCSV(csvText) {
 
   dataPoints.forEach(dp => {
     let currTime = dp.time;
-    if (!prev) {
-      prev = dp;
-    }
-    // 移除已离场人员（衰减）
+    if (!prev) prev = dp; // 第一个点作为参照
+
+    // 移除已离场人员
     peopleWest   = peopleWest.filter(p => p.exitTime > currTime);
     peopleEast   = peopleEast.filter(p => p.exitTime > currTime);
     peopleCircle = peopleCircle.filter(p => p.exitTime > currTime);
 
-    // 计算新进场人数（增量）
-    let dWest   = Math.max(dp.west - prev.west, 0);
-    let dEast   = Math.max(dp.east - prev.east, 0);
+    // 计算新进场人数 = max(当前累积 - 前一时刻累积, 0)
+    let dWest   = Math.max(dp.west   - prev.west,   0);
+    let dEast   = Math.max(dp.east   - prev.east,   0);
     let dCircle = Math.max(dp.circle - prev.circle, 0);
 
+    // 根据正态随机分布，给这些新进场的“离场时间”
     for (let i = 0; i < dWest; i++) {
-      let duration = randNormal(MEAN_HOURS, STD_HOURS);
+      let duration = randNormal(MEAN_HOURS, STD_HOURS); // hour
       let exitTime = new Date(currTime.getTime() + duration * 3600000);
       peopleWest.push({ exitTime });
     }
@@ -154,39 +225,62 @@ function processCSV(csvText) {
       peopleCircle.push({ exitTime });
     }
 
+    // 当前时刻对应的在场人数
     xAxis.push(formatTime(currTime));
     timeData.push(currTime);
     westOcc.push(peopleWest.length);
     eastOcc.push(peopleEast.length);
     circleOcc.push(peopleCircle.length);
+
     prev = dp;
   });
 
-  // 保存全局数据用于实时显示
-  globalOccupancies.timeData = timeData;
-  globalOccupancies.westOcc = westOcc;
-  globalOccupancies.eastOcc = eastOcc;
+  // =========== 将结果存到全局对象，以更新实时显示等 ===========
+  globalOccupancies.timeData  = timeData;
+  globalOccupancies.westOcc   = westOcc;
+  globalOccupancies.eastOcc   = eastOcc;
   globalOccupancies.circleOcc = circleOcc;
 
-  // 更新液晶显示
+  // 更新顶部三个“液晶数值”的实时显示
   updateRealtimeDisplay();
 
+  // =========== 在可视化前，根据营业时间设置“关门时段”数据为 null ===========
+  for (let i = 0; i < timeData.length; i++) {
+    let t = timeData[i];
+    // West/East
+    if (!isOpenWestEast(t)) {
+      westOcc[i] = null;
+      eastOcc[i] = null;
+    }
+    // Circle
+    if (!isOpenCircle(t)) {
+      circleOcc[i] = null;
+    }
+  }
+
+  // =========== 进一步做 SG 平滑处理 ===========
   // 固定卷积核：窗口长度 7，三次多项式拟合
   const sgKernel = [-2, 3, 6, 7, 6, 3, -2].map(x => x / 21);
-  const smoothWestOcc   = sgSmooth(westOcc,   sgKernel).map(v => Math.max(0, Math.floor(v)));
-  const smoothEastOcc   = sgSmooth(eastOcc,   sgKernel).map(v => Math.max(0, Math.floor(v)));
-  const smoothCircleOcc = sgSmooth(circleOcc, sgKernel).map(v => Math.max(0, Math.floor(v)));
+  const smoothWestOcc   = sgSmooth(westOcc,   sgKernel).map(v => Math.max(0, Math.floor(v || 0)));
+  const smoothEastOcc   = sgSmooth(eastOcc,   sgKernel).map(v => Math.max(0, Math.floor(v || 0)));
+  const smoothCircleOcc = sgSmooth(circleOcc, sgKernel).map(v => Math.max(0, Math.floor(v || 0)));
 
+  // 绘图
   renderChart(xAxis, smoothWestOcc, smoothEastOcc, smoothCircleOcc);
 }
 
-// 更新实时显示：分别计算 West, East, Circle 与15分钟前的差异
+/**
+ * 更新实时显示：比较当前时刻人数 & 若干分钟前的差异
+ */
 function updateRealtimeDisplay() {
   const timeData = globalOccupancies.timeData;
   if (!timeData.length) return;
+
   const currentIndex = timeData.length - 1;
+  // 当前时间点
   const currentTime = timeData[currentIndex];
 
+  // 计算与 5 分钟前的差值（你已有的逻辑）
   function computeDiff(arr) {
     const currentVal = arr[currentIndex];
     const targetTime = new Date(currentTime.getTime() - 5 * 60000);
@@ -197,33 +291,66 @@ function updateRealtimeDisplay() {
       }
     }
     const prevVal = arr[prevIndex];
-    return currentVal - prevVal;
+    return (currentVal || 0) - (prevVal || 0);
   }
-  const diffWest = computeDiff(globalOccupancies.westOcc);
-  const diffEast = computeDiff(globalOccupancies.eastOcc);
+
+  const diffWest   = computeDiff(globalOccupancies.westOcc);
+  const diffEast   = computeDiff(globalOccupancies.eastOcc);
   const diffCircle = computeDiff(globalOccupancies.circleOcc);
 
+  // 根据 ID 更新展示
   function updateElement(id, value, diff) {
-    let trendHTML = "";
-    if (diff > 0) {
-      // trendHTML = `<span style="color: #32CD32;">▲ ${diff}</span>`;
-      trendHTML = `<span class=realtime-indicator-up>▲${diff}</span>`;
-    } else if (diff < 0) {
-      // trendHTML = `<span style="color: #d9534f;">▼ ${Math.abs(diff)}</span>`;
-      trendHTML = `<span class=realtime-indicator-down>▼${Math.abs(diff)}</span>`;
-    } else {
-      trendHTML = `<span></span>`;
+    let container = document.getElementById(id);
+    if (!container) return;
+
+    // 1. 判断开放/关闭状态
+    let isOpen = false;
+    if (id.includes('west') || id.includes('east')) {
+      // West or East
+      isOpen = isOpenWestEast(currentTime);
+    } else if (id.includes('circle')) {
+      // Circle
+      isOpen = isOpenCircle(currentTime);
     }
-    document.getElementById(id).innerHTML =
-      `<span class="realtime-label">${id.split('-')[1]}</span><br>
-       <span class="realtime-count">${value}${trendHTML}</span> `;
+
+    // 2. 准备一个 badge
+    let badgeHTML = '';
+    if (isOpen) {
+      badgeHTML = `<span class="realtime-status-badge realtime-open">OPEN</span>`;
+    } else {
+      badgeHTML = `<span class="realtime-status-badge realtime-closed">CLOSED</span>`;
+    }
+
+    // 3. 处理▲▼图标
+    let trendHTML = '';
+    if (diff > 0) {
+      trendHTML = `<span class="realtime-indicator-up">▲${diff}</span>`;
+    } else if (diff < 0) {
+      trendHTML = `<span class="realtime-indicator-down">▼${Math.abs(diff)}</span>`;
+    } else {
+      trendHTML = `<span>-</span>`;
+    }
+
+    // 4. 把上述内容插到 .realtime-count 里
+    container.innerHTML = `
+      <span class="realtime-label">${id.split('-')[1]}${badgeHTML}</span><br>
+      <span class="realtime-count">
+        ${value || 0}${trendHTML}
+      </span>
+    `;
   }
-  updateElement("realtime-west", globalOccupancies.westOcc[currentIndex], diffWest);
-  updateElement("realtime-east", globalOccupancies.eastOcc[currentIndex], diffEast);
+
+  // 分别更新 West/East/Circle
+  updateElement("realtime-west",   globalOccupancies.westOcc[currentIndex],   diffWest);
+  updateElement("realtime-east",   globalOccupancies.eastOcc[currentIndex],   diffEast);
   updateElement("realtime-circle", globalOccupancies.circleOcc[currentIndex], diffCircle);
 }
 
-// 用 ECharts 进行可视化
+
+/**
+ * 用 ECharts 进行可视化
+ * 在同一个图表展示 West/East/Circle 三条线
+ */
 function renderChart(xAxis, wData, eData, cData) {
   if (!xAxis.length) {
     document.getElementById("chart").innerHTML =
@@ -231,26 +358,20 @@ function renderChart(xAxis, wData, eData, cData) {
     return;
   }
   let chartDom = document.getElementById('chart');
-  chartDom.innerHTML = '';
+  chartDom.innerHTML = ''; // 清空再绘制
   let myChart = echarts.init(chartDom);
 
-  // 当前时间字符串，如 "17:02"
+  // 当前时间（如 "17:02"）
   const now = formatTime(new Date());
 
-  // 如果 xAxis 里还没有当前时间，则插入
+  // 如果 xAxis 里还没有当前时间，则插入（可选）
   if (!xAxis.includes(now)) {
     xAxis.push(now);
-    // 如果需要保持时间升序，可以再排序一次
-    // 不过要注意排序后和 wData / eData / cData 的对应关系
-    // 这里为尽量少改动，暂不排序
+    // 未必需要排序；若要严格按时间顺序，则需一起对 wData/eData/cData 插入点或重排
   }
 
-  // 需要在轴标签上显示的时间点：
-  const showTimes = ['06:00','09:00','12:00', '15:00','18:00','21:00','22:00','23:00'];
-  // 同理，如果 showTimes 不包含当前时间，也插入
-  // if (!showTimes.includes(now)) {
-  //   showTimes.push(now);
-  // }
+  // 只显示部分标签
+  const showTimes = ['06:00','09:00','12:00','15:00','18:00','21:00','22:00','23:00'];
 
   let option = {
     tooltip: { trigger: 'axis' },
@@ -263,7 +384,7 @@ function renderChart(xAxis, wData, eData, cData) {
       axisLabel: {
         rotate: 45,
         formatter: function(value) {
-          // 如果 value 在 showTimes 列表里，就显示，否则返回空
+          // 只在 showTimes 列表中才显示
           return showTimes.includes(value) ? value : '';
         }
       }
@@ -275,23 +396,38 @@ function renderChart(xAxis, wData, eData, cData) {
       bottom: '15%'
     },
     series: [
-      { name: 'West',   type: 'line', smooth: true, data: wData },
-      { name: 'East',   type: 'line', smooth: true, data: eData },
+      {
+        name: 'West',
+        type: 'line',
+        smooth: true,
+        data: wData,
+        itemStyle: { color: '#F2A2A2' },    // 柔和粉
+        lineStyle: { color: '#F2A2A2' }
+      },
+      {
+        name: 'East',
+        type: 'line',
+        smooth: true,
+        data: eData,
+        itemStyle: { color: '#C5AAFF' },    // 淡紫
+        lineStyle: { color: '#C5AAFF' }
+      },
       {
         name: 'Circle',
         type: 'line',
         smooth: true,
         data: cData,
-        // 在最后一个系列中添加一条垂直虚线 markLine
+        itemStyle: { color: '#B5E8BC' },    // 浅绿
+        lineStyle: { color: '#B5E8BC' },
+        // 在最后一个系列中加垂直虚线 markLine
         markLine: {
-          symbol: 'none', // 不显示端点标记
+          symbol: 'none',
           lineStyle: {
             type: 'dashed',
             color: '#f68181'
           },
           data: [
-            // 使用 xAxis 属性，在 x 轴 = now 处画一条竖线
-            { xAxis: now }
+            { xAxis: now } // 用 xAxis 属性指定竖线的位置
           ]
         }
       }
@@ -303,6 +439,5 @@ function renderChart(xAxis, wData, eData, cData) {
 
 
 
-
-// 页面加载后立即执行数据加载函数
-loadData();
+// 页面加载后立即执行
+window.addEventListener('DOMContentLoaded', loadData);

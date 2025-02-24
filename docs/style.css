@@ -108,6 +108,30 @@ header h2 {
   font-size: 0.8rem;
 }
 
+/* 小角标的通用样式：字体较小，带点内边距和圆角 */
+.realtime-status-badge {
+  display: inline-block;
+  font-size: 0.7rem;       /* 根据需要可调小或更小 */
+  margin-left: 0.3rem;     /* 与数字之间留一点距离 */
+  padding: 0.1rem 0.2rem;
+  border-radius: 5px;      /* 让角标有个圆角 */
+  /*vertical-align: super;   !* 让它略微上移，像个角标 *!*/
+  font-weight: bold;
+}
+
+/* 开放状态：绿色底+深色字 */
+.realtime-open {
+  background-color: #029626; /* 青绿色 */
+  color: #000;
+}
+
+/* 闭馆状态：红色底+白字 */
+.realtime-closed {
+  background-color: #960226;
+  color: #fff;
+}
+
+
 /* ========== 关于按钮 ========== */
 #about-button {
   position: absolute;
