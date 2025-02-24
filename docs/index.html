@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <!-- 添加 viewport-fit=cover 以支持全屏安全区域 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MSU Sweat Scheduler 健身房人浪预报🌊</title>
+  
+  <!-- 引入液晶风格字体 VT323 -->
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  
+  <!-- 引入外部的CSS -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- 引入 seedrandom 和 ECharts 库 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+</head>
+<body>
+  <div class="main-container">
+    <!-- 顶部区域 -->
+    <header>
+      <h2>🌧Sweat Scheduler</h2>
+      <h2>MSU 健身房人浪预报🌊</h2>
+      <div id="realtime-container">
+        <div class="realtime-box" id="realtime-west">
+          <span class="realtime-label">West</span>
+          <span class="realtime-count">--</span>
+        </div>
+        <div class="realtime-box" id="realtime-east">
+          <span class="realtime-label">East</span>
+          <span class="realtime-count">--</span>
+        </div>
+        <div class="realtime-box" id="realtime-circle">
+          <span class="realtime-label">Circle</span>
+          <span class="realtime-count">--</span>
+        </div>
+      </div>
+      <!-- 保持原有的 onclick 不变，避免功能改变 -->
+      <button id="about-button" onclick="window.open('about.html', '_blank')"></button>
+    </header>
+    
+    <!-- 中间内容区域 -->
+    <div class="content">
+      <div id="chart"></div>
+    </div>
+    
+    <!-- 底部说明区域 -->
+    <footer>
+      <p>*Data source：<a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">MSU Recreational Sports and Fitness Services</a></p>
+      <p>Thanks to MSU for providing the data, this project is for personal study and time planning purposes only. <b>E-mail: zhan2374 [at] msu [dot] edu</b></p>
+      <p id="disclaimer">Disclaimer: Predictions may vary widely. Please refer to the actual numbers.</p>
+    </footer>
+  </div>
+  
+  <!-- 引入外部的JS -->
+  <script src="main.js"></script>
+</body>
+</html>
