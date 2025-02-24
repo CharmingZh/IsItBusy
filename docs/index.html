@@ -235,7 +235,7 @@
     // 主流程：读取 CSV -> 解析 -> 处理 -> 可视化
     async function loadData() {
       try {
-        const response = await fetch("https://raw.githubusercontent.com/CharmingZh/IsItBusy/refs/heads/master/data/today_data.csv");
+        const response = await fetch("https://raw.githubusercontent.com/CharmingZh/gym_data_repo/refs/heads/main/data/today_data.csv");
         if (!response.ok) {
           throw new Error("Failed to fetch CSV: " + response.statusText);
         }
