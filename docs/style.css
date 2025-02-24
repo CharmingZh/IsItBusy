@@ -1,0 +1,149 @@
+/* 全局盒模型和安全区域 */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: ;
+  /* 使用安全区域变量，确保内容不被刘海、状态栏和底部手势区域遮挡 */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  height: 100vh;
+  font-family: 'Arial', sans-serif;
+  background: #f4f4f9;
+  overflow: hidden;
+}
+
+/* 整体页面容器采用 Grid 布局 */
+.main-container {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 85%;
+}
+
+/* 顶部区域：标题、实时数据和关于按钮 */
+header {
+  padding: 0.5rem;
+  text-align: center;
+  position: relative;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+header h2 {
+  margin: 0.2rem 0;
+  font-size: 2rem;
+  color: #094b0a;
+}
+
+/* 实时显示区域 */
+#realtime-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 0.5rem;
+}
+
+.realtime-box {
+  background: #000;
+  color: #32CD32;
+  border: 4px solid #32CD32;
+  border-radius: 20px;
+  padding: 0.3rem 0.2rem;
+  font-family: 'VT323', monospace;
+  font-size: 2.5rem;
+  text-align: center;
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.realtime-label {
+  font-size: 2.5rem;
+  color: #fac5e8;
+}
+
+/* 关于按钮 */
+#about-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 2.5rem;
+  width: 35px;
+  height: 5px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #960226;
+  color: #970623;
+  font-size: 1.2rem;
+  line-height: 35px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+#about-button:hover,
+#about-button:active {
+  background: #32CD32;
+  color: #000;
+}
+
+/* 中间内容区域：图表区域 */
+.content {
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+#chart {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  padding: 10px;
+}
+
+/* 底部说明区域 */
+footer {
+  padding: 0.960226rem;
+  text-align: center;
+  font-size: 0.7rem;
+  color: #555;
+  background: #fff;
+  border-top: 1px solid #ddd;
+  border-radius: 10%;
+  overflow: auto;
+}
+
+footer a {
+  color: #007BFF;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+#disclaimer {
+  margin-top: 0.3rem;
+  color: #d9534f;
+}
+
+/* 针对较小屏幕的调整 */
+@media (max-width: 768px) {
+  header h2 {
+    font-size: 1.2rem;
+  }
+  .realtime-box {
+    font-size: 1.2rem;
+    padding: 0.2rem 0.4rem;
+  }
+  #about-button {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+    line-height: 30px;
+  }
+  footer {
+    font-size: 0.65rem;
+  }
+}
