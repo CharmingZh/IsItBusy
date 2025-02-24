@@ -14,7 +14,7 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  background: #f4f4f9;
+  background: #f6fff3;
   font-family: 'Arial', sans-serif;
   font-size: 17px;
   overflow: hidden; /* 取消滚动，让整个页面完全卡在一屏 */
@@ -40,7 +40,7 @@ header {
   padding: 0.3rem; /* 缩小一点默认间距，确保一屏放下 */
   text-align: center;
   position: relative;
-  background: #f4f4f9;
+  background: #f6fff3;
 }
 
 header h2 {
@@ -116,7 +116,7 @@ header h2 {
   width: 30px;
   height: 30px;
   border-radius: 26%;
-  background: #fff;
+  background: rgba(150, 2, 38, 0.1);
   border: 2px solid #960226;
   color: #970623;
   font-size: 1.2rem;
@@ -138,7 +138,7 @@ header h2 {
   width: 100%;
   /* 去掉min-height，避免撑高导致滚动 */
   /* min-height: 500px;  <-- 移除或改小 */
-  background: #fff;
+  background: #f6fff3;
   padding: 0.5rem;
   /* 若要让内部内容（如图表）自适应高度，可以使用 flex */
   display: flex;
