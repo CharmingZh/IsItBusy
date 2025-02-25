@@ -45,7 +45,7 @@ header {
 
 header h2 {
   margin: 0.2rem 0;
-  font-size: 1.2rem; /* 适当调小标题，避免过高 */
+  font-size: 1.2rem; /* 适当调小标题，避免过高  */
   color: #094b0a;
 }
 
