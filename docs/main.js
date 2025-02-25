@@ -60,50 +60,64 @@ function sgSmooth(arr, kernel) {
 
 /**
  * 判断 IM West/East 是否在给定时间营业
- * 根据你提供的表：
  *  - Mon-Fri: 6am - 11pm
- *  - Sat: 10am - 9pm
- *  - Sun: 10am - 10pm
+ *  - Saturday: 10am - 9pm
+ *  - Sunday: 10am - 10pm
  */
 function isOpenWestEast(dateObj) {
-  const day = dateObj.getDay();   // 0=周日,1=周一,...,6=周六
+  const day = dateObj.getDay();   // 0=Sun,1=Mon,...,6=Sat
   const hour = dateObj.getHours();
-  // Sunday (day = 0): 10am - 10pm
+
+  // Sunday (day=0): 10:00 - 22:00
   if (day === 0) {
     return hour >= 10 && hour < 22;
   }
-  // Saturday (day = 6): 10am - 9pm
+  // Saturday (day=6): 10:00 - 21:00
   if (day === 6) {
     return hour >= 10 && hour < 21;
   }
-  // Mon-Fri (day=1..5): 6am - 11pm
+  // Mon-Fri (day=1..5): 6:00 - 23:00
   return hour >= 6 && hour < 23;
 }
 
 /**
  * 判断 IM Circle 是否在给定时间营业
- *  - Monday-Thu: 7am - 10pm
- *  - Friday:     7am - 8pm
- *  - Sat-Sun:    12pm - 5pm
+ *  - Monday-Thursday: 7:00 - 10pm，但设备区 9:30am 才开 (你可以只从9:30算起)
+ *  - Friday:          7:00 - 8pm，但设备区 9:30am 才开
+ *  - Sat & Sun:       12pm - 5pm
+ *
+ * 如果你确实只想在 9:30 后才显示“OPEN”，可在 M-F 的判断中加分钟限制。
  */
 function isOpenCircle(dateObj) {
-  const day = dateObj.getDay();   // 0=Sun,6=Sat
-  const hour = dateObj.getHours();
+  const day = dateObj.getDay();     // 0=Sun,6=Sat
+  const hour = dateObj.getHours();  // 若要更精确到分钟，可再获取 dateObj.getMinutes()
 
   // Mon-Thu
   if (day >= 1 && day <= 4) {
-    return hour >= 7 && hour < 22;
+    // 若想从 7:00 开门，但设备9:30才可用 → 这里到底从何时标记为 open？
+    // 如果你要 9:30 以后才显示OPEN，就可改： if(hour < 9 || (hour === 9 && dateObj.getMinutes() < 30)) return false
+    if (hour < 7) return false;
+    if (hour >= 22) return false;
+    return true;
   }
+
   // Friday
   if (day === 5) {
-    return hour >= 7 && hour < 20;
+    // 7:00 - 20:00 (8pm)，同理看你要不要 9:30
+    if (hour < 7) return false;
+    if (hour >= 20) return false;
+    return true;
   }
-  // Sat + Sun
+
+  // Sat & Sun
   if (day === 6 || day === 0) {
+    // 12:00 - 17:00 (5pm)
     return hour >= 12 && hour < 17;
   }
+
   return false;
 }
+
 
 // 全局变量：保存实时人数数据 (时间序列)，用于更新液晶显示
 let globalOccupancies = {
@@ -278,7 +292,8 @@ function updateRealtimeDisplay() {
 
   const currentIndex = timeData.length - 1;
   // 当前时间点
-  const currentTime = timeData[currentIndex];
+  // const currentTime = timeData[currentIndex];
+  const currentTime = new Date();  // 直接取系统时间
 
   // 计算与 5 分钟前的差值（你已有的逻辑）
   function computeDiff(arr) {
