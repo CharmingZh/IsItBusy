@@ -49,11 +49,11 @@
 
     <!-- 底部说明区域 -->
     <footer>
-        <!-- 新增：系统运行时长 -->
-        <p id="system-runtime">本站点已运行: --</p>
+        <!-- 新增：系统运行时长 Site uptime: 4d 18h 48m 33s -->
+        <p id="system-runtime">Running for: --</p>
         <div id="data-refresh-info" class="data-info">
-            数据上次刷新: <span id="last-update">--:--</span>
-            (每5分钟刷新一次，数据可能有延迟)
+            Last update: <span id="last-update">--:--</span>
+            (refreshes every 5 min, may be delayed)
         </div>
 
 
@@ -68,7 +68,7 @@
             const minutes = Math.floor(diff / (1000 * 60)) % 60;
             const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            document.getElementById("system-runtime").innerText = `本站点已运行: ${days}天 ${hours}时 ${minutes}分 ${seconds}秒; `;
+            document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s; `;
           }
 
           // 每秒更新一次
@@ -77,14 +77,14 @@
         </script>
 
 
-      <p class="disclaimer">Predictions may vary widely. Please refer to the actual numbers.</p>
+      <p class="disclaimer">Predictions may vary. Refer to actual data.</p>
 <!--      <p>*Data source：-->
 <!--          <a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">-->
 <!--              MSU Recreational Sports and Fitness Services-->
 <!--          </a>-->
 <!--      </p>-->
-      <p>Thanks to MSU for the <a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">data</a>❤, this is for personal study and time planning purposes only.</p>
-      <p><b>📧E-mail: zhan2374 [at] msu [dot] edu</b></p>
+      <p>Thanks to MSU for the <a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">data</a>❤. This project is for personal study and planning only.</p>
+      <p><b>Contact📧: zhan2374 [at] msu [dot] edu</b></p>
     </footer>
   </div>
 

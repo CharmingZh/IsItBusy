@@ -416,7 +416,7 @@ function renderChart(xAxis, wData, eData, cData) {
       type: 'category',
       data: xAxis,
       axisLabel: {
-        fontSize: 10,  // 这里调整 X 轴刻度字体大小
+        // fontSize: 12,  // 这里调整 X 轴刻度字体大小
         rotate: 45,
         formatter: function(value) {
           // 只在 showTimes 列表中才显示
