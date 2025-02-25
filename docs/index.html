@@ -49,11 +49,32 @@
 
     <!-- 底部说明区域 -->
     <footer>
+        <!-- 新增：系统运行时长 -->
+        <p id="system-runtime">本站点已运行: --</p>
+        <div id="data-refresh-info" class="data-info">
+            数据上次刷新: <span id="last-update">--:--</span>
+            (每5分钟刷新一次，数据可能有延迟)
+        </div>
 
-      <div id="data-refresh-info" class="data-info">
-        上次更新: <span id="last-update">--:--</span>
-         (每5分钟刷新一次，数据可能有延迟)
-      </div>
+
+        <script>
+          // 系统启动时间：2025-02-20 22:47:07
+          const systemStartTime = new Date("2025-02-20T22:47:07");
+
+          function updateRuntime() {
+            const now = new Date();
+            const diff = now - systemStartTime;
+            const seconds = Math.floor(diff / 1000) % 60;
+            const minutes = Math.floor(diff / (1000 * 60)) % 60;
+            const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            document.getElementById("system-runtime").innerText = `本站点已运行: ${days}天 ${hours}时 ${minutes}分 ${seconds}秒; `;
+          }
+
+          // 每秒更新一次
+          updateRuntime();
+          setInterval(updateRuntime, 1000);
+        </script>
 
 
       <p class="disclaimer">Predictions may vary widely. Please refer to the actual numbers.</p>
