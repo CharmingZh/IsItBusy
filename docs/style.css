@@ -147,8 +147,8 @@ header h2 {
   position: absolute;
   top: 0.3rem;
   right: 0.5rem;
-  width: 10px;
-  height: 10px;
+  width: 1px;
+  height: 1px;
   border-radius: 26%;
   background: rgba(150, 2, 38, 0.1);
   border: 2px solid #960226;
