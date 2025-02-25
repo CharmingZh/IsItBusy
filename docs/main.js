@@ -306,7 +306,7 @@ function updateRealtimeDisplay() {
   // 计算与 5 分钟前的差值（你已有的逻辑）
   function computeDiff(arr) {
     const currentVal = arr[currentIndex];
-    const targetTime = new Date(currentTime.getTime() - 5 * 60000);
+    const targetTime = new Date(currentTime.getTime() - 15 * 60000);
     let prevIndex = 0;
     for (let i = 0; i < timeData.length; i++) {
       if (timeData[i] <= targetTime) {
