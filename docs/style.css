@@ -188,10 +188,6 @@ header h2 {
   border-radius: 15px;
   box-shadow: 0 4px 16px 4px rgba(0, 255, 247, 0.2);
   padding: 5%;
-  /*padding-left: 5%;*/
-  /*padding-aright: 5%;*/
-  /*padding-bottom: 0%;*/
-  /*padding-top: 0%;*/
   /* 如果要最大化图表，可在这里进一步调小内边距 */
 }
 
