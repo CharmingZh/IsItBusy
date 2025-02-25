@@ -343,7 +343,7 @@ function updateRealtimeDisplay() {
     } else if (diff < 0) {
       trendHTML = `<span class="realtime-indicator-down">▼${Math.abs(diff)}</span>`;
     } else {
-      trendHTML = `<span>-</span>`;
+      trendHTML = `<span class="realtime-indicator-none">┉</span>`;
     }
 
     // 4. 把上述内容插到 .realtime-count 里

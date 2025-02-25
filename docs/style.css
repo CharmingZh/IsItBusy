@@ -108,6 +108,12 @@ header h2 {
   font-size: 0.75rem;
 }
 
+.realtime-indicator-none {
+    font-family: 'Doto', sans-serif;
+  color: #32CD32;
+  font-size: 1.125rem;
+}
+
 /* 小角标的通用样式：字体较小，带点内边距和圆角 */
 .realtime-status-badge {
   display: inline-block;
