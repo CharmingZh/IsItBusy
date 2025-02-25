@@ -76,14 +76,17 @@ header h2 {
 }
 
 .realtime-box-west {
-  box-shadow: 0 4px 4px rgba(242,162,162, 1.5);
+  box-shadow: 0 4px 16px 4px rgba(242,162,162, 1.2);
 }
+
 .realtime-box-circle {
-  box-shadow: 0 4px 4px rgba(181,232,188, 1.5);
+  box-shadow: 0 4px 16px 4px rgba(15, 173, 15, 0.8);
 }
+
 .realtime-box-east {
-  box-shadow: 0 4px 4px rgba(197,170,255, 1.5);
+  box-shadow: 0 4px 16px 4px rgba(197,170,255, 1.2);
 }
+
 
 .realtime-label {
   font-size: 3rem; /* 调小一些 */
