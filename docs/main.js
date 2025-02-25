@@ -95,16 +95,18 @@ function isOpenCircle(dateObj) {
   // Mon-Thu
   if (day >= 1 && day <= 4) {
     // 若想从 7:00 开门，但设备9:30才可用 → 这里到底从何时标记为 open？
-    // 如果你要 9:30 以后才显示OPEN，就可改： if(hour < 9 || (hour === 9 && dateObj.getMinutes() < 30)) return false
-    if (hour < 7) return false;
+
+    // if (hour < 7) return false; // 如果你要 7：00 以后才显示OPEN，就可改：
+    if(hour < 9 || (hour === 9 && dateObj.getMinutes() < 30)) return false  // 如果你要 9:30 以后才显示OPEN，就可改：
     if (hour >= 22) return false;
     return true;
   }
 
   // Friday
   if (day === 5) {
-    // 7:00 - 20:00 (8pm)，同理看你要不要 9:30
-    if (hour < 7) return false;
+
+    // if (hour < 7) return false; // 7:00 - 20:00 (8pm)，同理看你要不要 9:30
+    if(hour < 9 || (hour === 9 && dateObj.getMinutes() < 30)) return false  // 如果你要 9:30 以后才显示OPEN，就可改：
     if (hour >= 20) return false;
     return true;
   }
