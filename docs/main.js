@@ -355,7 +355,7 @@ function updateElement(id, value, diff) {
     } else if (diff < 0) {
       trendHTML = `<span class="realtime-indicator-down">▼${Math.abs(diff)}</span>`;
     } else {
-      trendHTML = `<span class="realtime-indicator-none" style="color: #999999;">┉</span>`;
+      trendHTML = `<span class="realtime-indicator-none">┉</span>`;
     }
     displayHTML = `
       <span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}${badgeHTML}</span><br>

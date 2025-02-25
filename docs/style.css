@@ -113,8 +113,9 @@ header h2 {
 
 .realtime-indicator-none {
     font-family: 'Doto', sans-serif;
-  color: #32CD32;
-  font-size: 1.125rem;
+  color: #767676;
+  /*font-size: 1.125rem;*/
+  font-size: 0.75rem;
 }
 
 /* 小角标的通用样式：字体较小，带点内边距和圆角 */
