@@ -3,6 +3,10 @@
  * 集成营业时间可视化 + 原有功能优化
  *********************************************/
 
+// DEBUG: 取消下面的注释即可覆盖当前时间，方便调试（例如：2023-12-31 10:00:00）
+// let debugTime = new Date("2025-2-25 06:05:00");
+
+
 // 固定随机种子，确保刷新时随机数序列一致
 Math.seedrandom('fixed-seed');
 
@@ -294,8 +298,10 @@ function updateRealtimeDisplay() {
 
   const currentIndex = timeData.length - 1;
   // 当前时间点
-  // const currentTime = timeData[currentIndex];
-  const currentTime = new Date();  // 直接取系统时间
+  // const currentTime = timeData[currentIndex];  // BUG: 会出现永远无法下班的情况
+  // const currentTime = new Date();  // 直接取系统时间  // 添加下一行的代码，就可以随时手动设置时间
+  const currentTime = (typeof debugTime !== 'undefined') ? debugTime : new Date();
+
 
   // 计算与 5 分钟前的差值（你已有的逻辑）
   function computeDiff(arr) {
@@ -316,46 +322,57 @@ function updateRealtimeDisplay() {
   const diffCircle = computeDiff(globalOccupancies.circleOcc);
 
   // 根据 ID 更新展示
-  function updateElement(id, value, diff) {
-    let container = document.getElementById(id);
-    if (!container) return;
+function updateElement(id, value, diff) {
+  let container = document.getElementById(id);
+  if (!container) return;
 
-    // 1. 判断开放/关闭状态
-    let isOpen = false;
-    if (id.includes('west') || id.includes('east')) {
-      // West or East
-      isOpen = isOpenWestEast(currentTime);
-    } else if (id.includes('circle')) {
-      // Circle
-      isOpen = isOpenCircle(currentTime);
-    }
+  // 判断营业状态
+  let isOpen = false;
+  if (id.includes('west') || id.includes('east')) {
+    isOpen = isOpenWestEast(currentTime);
+  } else if (id.includes('circle')) {
+    isOpen = isOpenCircle(currentTime);
+  }
 
-    // 2. 准备一个 badge
-    let badgeHTML = '';
-    if (isOpen) {
-      badgeHTML = `<span class="realtime-status-badge realtime-open">OPEN</span>`;
-    } else {
-      badgeHTML = `<span class="realtime-status-badge realtime-closed">CLOSED</span>`;
-    }
+  // 如果未营业，则设置 label 为灰色，且移除 box-shadow
+  let labelColor = isOpen ? "#00ffc4" : "#767676";
+  container.style.boxShadow = isOpen ? "" : "none";
 
-    // 3. 处理▲▼图标
+  // 构建状态徽章
+  let badgeHTML = '';
+  if (isOpen) {
+    badgeHTML = `<span class="realtime-status-badge realtime-open">OPEN</span>`;
+  } else {
+    badgeHTML = `<span class="realtime-status-badge realtime-closed">CLOSED</span>`;
+  }
+
+  // 根据状态构建显示内容
+  let displayHTML = '';
+  if (isOpen) {
     let trendHTML = '';
     if (diff > 0) {
       trendHTML = `<span class="realtime-indicator-up">▲${diff}</span>`;
     } else if (diff < 0) {
       trendHTML = `<span class="realtime-indicator-down">▼${Math.abs(diff)}</span>`;
     } else {
-      trendHTML = `<span class="realtime-indicator-none">┉</span>`;
+      trendHTML = `<span class="realtime-indicator-none" style="color: #999999;">┉</span>`;
     }
-
-    // 4. 把上述内容插到 .realtime-count 里
-    container.innerHTML = `
-      <span class="realtime-label">${id.split('-')[1]}${badgeHTML}</span><br>
+    displayHTML = `
+      <span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}${badgeHTML}</span><br>
       <span class="realtime-count">
         ${value || 0}${trendHTML}
       </span>
     `;
+  } else {
+    // 未营业时只显示 CLOSED
+    displayHTML = `
+      <span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}</span><br>
+      <span class="realtime-count" style="color: red;">CLOSED</span>
+    `;
   }
+  container.innerHTML = displayHTML;
+}
+
 
   // 分别更新 West/East/Circle
   updateElement("realtime-west",   globalOccupancies.westOcc[currentIndex],   diffWest);
