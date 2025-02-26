@@ -343,7 +343,7 @@ class Firework {
     this.color = 'white';
     this.exploded = false;
     this.particles = [];
-    this.explosionHeight = Math.random() * (canvas.height * 0.3) + (canvas.height * 0.5);
+    this.explosionHeight = Math.random() * (canvas.height * 0.3) + (canvas.height * 0.05);
     this.initialAlpha = 1;
     this.currentAlpha = this.initialAlpha;
   }
@@ -389,7 +389,7 @@ class Particle {
     this.radius = 2;
     this.speedX = Math.random() * 5 - 2;
     this.speedY = Math.random() * 5 - 2;
-    this.color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+    this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
     this.alpha = 1.5;
     this.fade = Math.random() * 0.05 + 0.01;
   }
@@ -436,7 +436,7 @@ ctx.globalCompositeOperation = prevComposite;
 function initFireworks() {
   setInterval(() => {
     fireworks.push(new Firework());
-  }, 226);
+  }, 226 + 100);
   animateFireworks();
 }
 initFireworks();

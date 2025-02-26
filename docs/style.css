@@ -227,11 +227,11 @@ footer {
 /* ========== 烟花动画 canvas 样式  ========== */
 #fireworksCanvas {
   position: fixed;
-  top: 60vh;     /* 从 85vh 开始，即底部15% */
+  top: 0vh;     /* 从 85vh 开始，即底部15% */
   left: 0;
   width: 100%;
-  height: 40vh;  /* 高度为 15vh */
+  height: 100vh;  /* 高度为 15vh */
   z-index: 2;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.2;
 }
