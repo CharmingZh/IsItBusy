@@ -224,7 +224,7 @@ footer {
   }
 }
 
-/* ========== 烟花动画 canvas 样式 ========== */
+/* ========== 烟花动画 canvas 样式  ========== */
 #fireworksCanvas {
   position: fixed;
   top: 60vh;     /* 从 85vh 开始，即底部15% */
