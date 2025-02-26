@@ -6,46 +6,47 @@
 }
 
 /*
-   1. 移除 body 的 height:100% 和 overflow:auto，避免额外滚动。
-   2. 保持安全区域的基础，可以在 main-container 中设置。
+   设置 body 背景为透明（因为原来是纯色，会遮盖烟花），
+   并取消滚动，使页面卡在一屏。
 */
 html,
 body {
   margin: 0;
   padding: 0;
   width: 100%;
-  background: #f6fff3;
+  background: transparent;
   font-family: 'Arial', sans-serif;
   font-size: 17px;
-  overflow: hidden; /* 取消滚动，让整个页面完全卡在一屏 */
+  overflow: hidden;
 }
 
 /*
-   让主容器填满屏幕可用高度 (100dvh)，
-   同时利用安全区域内边距避免刘海、底部遮挡。
+   主容器采用半透明背景（原色 #f6fff3 改为 rgba 形式），
+   并设置 position relative 和 z-index 高于烟花 canvas
 */
 .main-container {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  /* 动态视口高度 + 安全区域内边距 */
   height: 100dvh;
   padding-top: env(safe-area-inset-top);
   padding-right: env(safe-area-inset-right);
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
+  background-color: rgba(246, 255, 243, 0.95);
 }
 
 /* ========== 顶部区域 header ========== */
 header {
-  padding: 0.3rem; /* 缩小一点默认间距，确保一屏放下 */
+  padding: 0.3rem;
   text-align: center;
   position: relative;
-  background: #f6fff3;
+  background: rgba(246, 255, 243, 0.95);
 }
-
 header h2 {
   margin: 0.2rem 0;
-  font-size: 1.2rem; /* 适当调小标题，避免过高  */
+  font-size: 1.2rem;
   color: #094b0a;
 }
 
@@ -53,8 +54,8 @@ header h2 {
 #realtime-container {
   display: flex;
   justify-content: center;
-  gap: 15px;          /* 缩小间隔 */
-  height: 55px;      /* 适当调小高度 */
+  gap: 15px;
+  height: 55px;
   margin-top: 0.3rem;
 }
 
@@ -67,9 +68,9 @@ header h2 {
   border-radius: 17px;
   padding: 0.2rem 0.3rem;
   font-family: 'VT323', monospace;
-  font-size: 1rem;   /* 适当调小字体 */
+  font-size: 1rem;
   text-align: center;
-  min-width: 100px;   /* 控制盒子最小宽度 */
+  min-width: 100px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -87,16 +88,15 @@ header h2 {
   box-shadow: 0 4px 16px 4px rgba(197,170,255, 1.2);
 }
 
-
 .realtime-label {
-  font-size: 3rem; /* 调小一些 */
+  font-size: 3rem;
   color: #00ffc4;
   margin-bottom: -17px;
 }
 
 .realtime-count {
   font-family: 'Doto', sans-serif;
-  font-size: 2.5rem; /* 调小一些 */
+  font-size: 2.5rem;
 }
 
 .realtime-indicator-up {
@@ -112,37 +112,30 @@ header h2 {
 }
 
 .realtime-indicator-none {
-    font-family: 'Doto', sans-serif;
+  font-family: 'Doto', sans-serif;
   color: #767676;
-  /*font-size: 1.125rem;*/
   font-size: 0.75rem;
 }
 
-/* 小角标的通用样式：字体较小，带点内边距和圆角 */
 .realtime-status-badge {
   display: inline-block;
-  font-size: 0.5rem;       /* 根据需要可调小或更小 */
-  margin-left: 0.3rem;     /* 与数字之间留一点距离 */
+  font-size: 0.5rem;
+  margin-left: 0.3rem;
   padding: 0.1rem 0.2rem;
-  border-radius: 5px;      /* 让角标有个圆角 */
-  /*vertical-align: super;   !* 让它略微上移，像个角标 *!*/
+  border-radius: 5px;
   font-weight: bold;
 }
 
-/* 开放状态：绿色底+深色字 */
 .realtime-open {
-  background-color: #029626; /* 青绿色 */
+  background-color: #029626;
   color: #000;
 }
 
-/* 闭馆状态：红色底+白字 */
 .realtime-closed {
   background-color: #960226;
   color: #fff;
 }
 
-
-/* ========== 关于按钮 ========== */
 #about-button {
   position: absolute;
   top: 0.3rem;
@@ -168,41 +161,44 @@ header h2 {
 
 /* ========== 中间内容区域 ========== */
 .content {
-  /* 在Grid中，此区占用中间可伸缩的空间 */
   width: 100%;
-  /* 去掉min-height，避免撑高导致滚动 */
-  /* min-height: 500px;  <-- 移除或改小 */
-  background: #f6fff3;
+  background: rgba(246, 255, 243, 0.95);
   padding: 0.5rem;
-  /* 若要让内部内容（如图表）自适应高度，可以使用 flex */
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center; /* 让图表居中 */
+  align-items: center;
 }
 
 #chart {
   width: 100%;
-  /* 根据中间区域自适应 */
   flex: 1;
   background: #fff;
   border-radius: 15px;
   box-shadow: 0 4px 16px 4px rgba(0, 255, 247, 0.2);
   padding: 5%;
-  /* 如果要最大化图表，可在这里进一步调小内边距 */
 }
 
-/* ========== 底部说明区域 footer ========== */
+/* ========== 底部区域 ========== */
 footer {
+  position: relative; /* 让 footer 成为定位容器 */
   text-align: center;
-  font-size: 0.6rem; /* 缩小字体，给中间区更多空间 */
+  font-size: 0.6rem;
   color: #555;
-  background: #f6fff3;
-  /*border-top: 0px solid #ddd;*/
-  border-radius: 0px;
+  background: rgba(246, 255, 243, 0.95);
   padding: 0.3rem 0.2rem;
-  /*box-shadow: 0 -2px 4px rgba(0,0,0,0.05);*/
 }
+
+/*#fireworksCanvas {*/
+/*  position: absolute;*/
+/*  top: 0;*/
+/*  left: 0;*/
+/*  width: 100%;*/
+/*  height: 100%;*/
+/*  z-index: -1;        !* 放在 footer 内容后面 *!*/
+/*  pointer-events: none;*/
+/*  opacity: 0.2;       !* 根据需要调整 *!*/
+/*}*/
 
 .disclaimer {
   color: #960226;
@@ -226,4 +222,16 @@ footer {
   footer {
     font-size: 0.5rem;
   }
+}
+
+/* ========== 烟花动画 canvas 样式 ========== */
+#fireworksCanvas {
+  position: fixed;
+  top: 60vh;     /* 从 85vh 开始，即底部15% */
+  left: 0;
+  width: 100%;
+  height: 40vh;  /* 高度为 15vh */
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.4;
 }

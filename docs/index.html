@@ -6,11 +6,11 @@
   <meta charset="utf-8" />
   <!-- 添加 viewport-fit=cover 以支持全屏安全区域 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <!-- 默认标题（非节日状态下） -->
   <title>MSU Sweat Scheduler 健身房人浪预报🌊</title>
 
   <!-- 引入液晶风格字体 VT323 -->
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-
   <!-- 引入外部的CSS -->
   <link rel="stylesheet" href="style.css">
 
@@ -19,10 +19,14 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 </head>
 <body>
+  <!-- 新增：全屏烟花 canvas（放在最前面，但在样式中设置 z-index 为 0） -->
+  <canvas id="fireworksCanvas"></canvas>
+
+  <!-- 原有主要内容，设置为相对定位并半透明背景以便烟花透过 -->
   <div class="main-container">
     <!-- 顶部区域 -->
     <header>
-<!--      <h2>🌧Sweat Scheduler</h2>-->
+      <!-- 原有标题（节日效果会在 JS 中自动替换） -->
       <h2>MSU 健身房人浪预报🌊</h2>
       <div id="realtime-container">
         <div class="realtime-box-west" id="realtime-west">
@@ -38,7 +42,7 @@
           <span class="realtime-count">--</span>
         </div>
       </div>
-      <!-- 保持原有的 onclick 不变，避免功能改变  -->
+      <!-- 保持原有 onclick 不变 -->
       <button id="about-button" onclick="window.open('about.html', '_blank')">≡</button>
     </header>
 
@@ -49,46 +53,38 @@
 
     <!-- 底部说明区域 -->
     <footer>
-        <!-- 新增：系统运行时长 Site uptime: 4d 18h 48m 33s -->
-        <p id="system-runtime">Running for: --</p>
-        <div id="data-refresh-info" class="data-info">
-            Last update: <span id="last-update">--:--</span>
-            (refreshes every 5 min, may be delayed)
-        </div>
+<!--      <canvas id="fireworksCanvas"></canvas>-->
+      <!-- 新增：系统运行时长 -->
+      <p id="system-runtime">Running for: --</p>
+      <div id="data-refresh-info" class="data-info">
+          Last update: <span id="last-update">--:--</span>
+          (refreshes every 5 min, may be delayed)
+      </div>
 
+      <script>
+        // 系统启动时间：2025-02-20 22:47:07
+        const systemStartTime = new Date("2025-02-20T22:47:07");
 
-        <script>
-          // 系统启动时间：2025-02-20 22:47:07
-          const systemStartTime = new Date("2025-02-20T22:47:07");
-
-          function updateRuntime() {
-            const now = new Date();
-            const diff = now - systemStartTime;
-            const seconds = Math.floor(diff / 1000) % 60;
-            const minutes = Math.floor(diff / (1000 * 60)) % 60;
-            const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s; `;
-          }
-
-          // 每秒更新一次
-          updateRuntime();
-          setInterval(updateRuntime, 1000);
-        </script>
-
+        function updateRuntime() {
+          const now = new Date();
+          const diff = now - systemStartTime;
+          const seconds = Math.floor(diff / 1000) % 60;
+          const minutes = Math.floor(diff / (1000 * 60)) % 60;
+          const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s; `;
+        }
+        updateRuntime();
+        setInterval(updateRuntime, 1000);
+      </script>
 
       <p class="disclaimer">Predictions may vary. Refer to actual data.</p>
-<!--      <p>*Data source：-->
-<!--          <a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">-->
-<!--              MSU Recreational Sports and Fitness Services-->
-<!--          </a>-->
-<!--      </p>-->
       <p>Thanks to MSU for the <a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">data</a>❤. This project is for personal study and planning only.</p>
       <p><b>Contact📧: zhan2374 [at] msu [dot] edu</b></p>
     </footer>
   </div>
 
-  <!-- 引入外部的JS -->
+  <!-- 引入业务逻辑及烟花动画的 JS（合并所有 JS 逻辑到 main.js 中） -->
   <script src="main.js"></script>
 </body>
 </html>

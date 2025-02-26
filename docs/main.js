@@ -3,9 +3,20 @@
  * 集成营业时间可视化 + 原有功能优化
  *********************************************/
 
-// DEBUG: 取消下面的注释即可覆盖当前时间，方便调试（例如：2023-12-31 10:00:00）
-// let debugTime = new Date("2025-2-25 06:05:00");
-
+// =====================
+// 节日日期判断：如果今天是每年2月26，则替换 <title> 与 <header> 中的 <h2>
+// =====================
+(function() {
+  const now = new Date();
+  // 注意：JS中月份从0开始，所以 1 代表2月
+  if (now.getMonth() === 1 && now.getDate() === 26) {
+    document.title = "MSU Sweat Scheduler 🎂健身房人浪预报🎉";
+    const h2 = document.querySelector("header h2");
+    if (h2) {
+      h2.innerHTML = "MSU 健身房人浪预报🎂";
+    }
+  }
+})();
 
 // 固定随机种子，确保刷新时随机数序列一致
 Math.seedrandom('fixed-seed');
@@ -37,7 +48,7 @@ function randNormal(mean, stdDev) {
 function fixDateToToday(dateStr) {
   let parts = dateStr.split(/\s+/);
   if (parts.length < 2) return null;
-  let [_, hhmmss] = parts; // 只要时分秒部分
+  let [_, hhmmss] = parts; // 只取时分秒
   let [hh, mm, ss] = hhmmss.split(":").map(Number);
   let now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, ss);
@@ -69,63 +80,37 @@ function sgSmooth(arr, kernel) {
  *  - Sunday: 10am - 10pm
  */
 function isOpenWestEast(dateObj) {
-  const day = dateObj.getDay();   // 0=Sun,1=Mon,...,6=Sat
+  const day = dateObj.getDay();
   const hour = dateObj.getHours();
-
-  // Sunday (day=0): 10:00 - 22:00
-  if (day === 0) {
-    return hour >= 10 && hour < 22;
-  }
-  // Saturday (day=6): 10:00 - 21:00
-  if (day === 6) {
-    return hour >= 10 && hour < 21;
-  }
-  // Mon-Fri (day=1..5): 6:00 - 23:00
+  if (day === 0) return hour >= 10 && hour < 22;
+  if (day === 6) return hour >= 10 && hour < 21;
   return hour >= 6 && hour < 23;
 }
 
 /**
  * 判断 IM Circle 是否在给定时间营业
- *  - Monday-Thursday: 7:00 - 10pm，但设备区 9:30am 才开 (你可以只从9:30算起)
- *  - Friday:          7:00 - 8pm，但设备区 9:30am 才开
+ *  - Monday-Thursday: 7:00 - 10pm（设备区 9:30 才开）
+ *  - Friday:          7:00 - 8pm（设备区 9:30 才开）
  *  - Sat & Sun:       12pm - 5pm
- *
- * 如果你确实只想在 9:30 后才显示“OPEN”，可在 M-F 的判断中加分钟限制。
  */
 function isOpenCircle(dateObj) {
-  const day = dateObj.getDay();     // 0=Sun,6=Sat
-  const hour = dateObj.getHours();  // 若要更精确到分钟，可再获取 dateObj.getMinutes()
-
-  // Mon-Thu
+  const day = dateObj.getDay();
+  const hour = dateObj.getHours();
   if (day >= 1 && day <= 4) {
-    // 若想从 7:00 开门，但设备9:30才可用 → 这里到底从何时标记为 open？
-
-    // if (hour < 7) return false; // 如果你要 7：00 以后才显示OPEN，就可改：
-    if(hour < 9 || (hour === 9 && dateObj.getMinutes() < 30)) return false  // 如果你要 9:30 以后才显示OPEN，就可改：
+    if (hour < 9 || (hour === 9 && dateObj.getMinutes() < 30)) return false;
     if (hour >= 22) return false;
     return true;
   }
-
-  // Friday
   if (day === 5) {
-
-    // if (hour < 7) return false; // 7:00 - 20:00 (8pm)，同理看你要不要 9:30
-    if(hour < 9 || (hour === 9 && dateObj.getMinutes() < 30)) return false  // 如果你要 9:30 以后才显示OPEN，就可改：
+    if (hour < 9 || (hour === 9 && dateObj.getMinutes() < 30)) return false;
     if (hour >= 20) return false;
     return true;
   }
-
-  // Sat & Sun
-  if (day === 6 || day === 0) {
-    // 12:00 - 17:00 (5pm)
-    return hour >= 12 && hour < 17;
-  }
-
+  if (day === 6 || day === 0) return hour >= 12 && hour < 17;
   return false;
 }
 
-
-// 全局变量：保存实时人数数据 (时间序列)，用于更新液晶显示
+// 全局变量：保存实时人数数据（时间序列），用于更新液晶显示
 let globalOccupancies = {
   timeData: [],
   westOcc: [],
@@ -139,20 +124,15 @@ let globalOccupancies = {
 async function loadData() {
   try {
     const response = await fetch("https://raw.githubusercontent.com/CharmingZh/gym_data_repo/refs/heads/main/data/today_data.csv");
-    if (!response.ok) {
-      throw new Error("Failed to fetch CSV: " + response.statusText);
-    }
+    if (!response.ok) throw new Error("Failed to fetch CSV: " + response.statusText);
     const text = await response.text();
     processCSV(text);
-
     // 更新 "last-update" 显示
     const now = new Date();
-    document.getElementById('last-update').innerText =
-      formatTime(now); // 比如 "17:05"
+    document.getElementById('last-update').innerText = formatTime(now);
   } catch (err) {
     console.error("Error fetching data:", err);
-    document.getElementById("chart").innerHTML =
-      "<p style='color: red;'>Failed to load data.</p>";
+    document.getElementById("chart").innerHTML = "<p style='color: red;'>Failed to load data.</p>";
   }
 }
 
@@ -163,52 +143,32 @@ function processCSV(csvText) {
   const MEAN_HOURS = 1.0;
   const STD_HOURS  = 0.4;
   let lines = csvText.trim().split("\n");
-
-  // 解析每行，得到时间 + (west,east,circle)
   let rawData = lines.map(line => {
     let [timeStr, w, e, c] = line.split(/,\s*/);
-    if (!timeStr || w === undefined || e === undefined || c === undefined) {
-      return null;
-    }
+    if (!timeStr || w === undefined || e === undefined || c === undefined) return null;
     let t = fixDateToToday(timeStr);
     if (!t || isNaN(t.getTime())) return null;
-    return {
-      time: t,
-      west: Number(w),
-      east: Number(e),
-      circle: Number(c)
-    };
+    return { time: t, west: Number(w), east: Number(e), circle: Number(c) };
   }).filter(Boolean);
 
-  // 若无有效数据
   if (!rawData.length) {
-    document.getElementById("chart").innerHTML =
-      "<p style='color:red;'>No valid data available.</p>";
+    document.getElementById("chart").innerHTML = "<p style='color:red;'>No valid data available.</p>";
     return;
   }
-
-  // 按时间升序
   rawData.sort((a, b) => a.time - b.time);
-
-  // 只保留 6:00 ~ 23:00 的数据（如果你只想显示这一段）
   let dataPoints = rawData.filter(dp => {
     let h = dp.time.getHours();
     return h >= 6 && h <= 23;
   });
   if (!dataPoints.length) {
-    document.getElementById("chart").innerHTML =
-      "<p style='color:red;'>No data in 6:00-23:00.</p>";
+    document.getElementById("chart").innerHTML = "<p style='color:red;'>No data in 6:00-23:00.</p>";
     return;
   }
-
-  // 用于构建在场人数的时间序列
   let xAxis = [];
   let timeData = [];
   let westOcc = [];
   let eastOcc = [];
   let circleOcc = [];
-
-  // 用来跟踪“在场人员”的数组(随机生成离场时间)
   let peopleWest = [];
   let peopleEast = [];
   let peopleCircle = [];
@@ -216,21 +176,15 @@ function processCSV(csvText) {
 
   dataPoints.forEach(dp => {
     let currTime = dp.time;
-    if (!prev) prev = dp; // 第一个点作为参照
-
-    // 移除已离场人员
+    if (!prev) prev = dp;
     peopleWest   = peopleWest.filter(p => p.exitTime > currTime);
     peopleEast   = peopleEast.filter(p => p.exitTime > currTime);
     peopleCircle = peopleCircle.filter(p => p.exitTime > currTime);
-
-    // 计算新进场人数 = max(当前累积 - 前一时刻累积, 0)
-    let dWest   = Math.max(dp.west   - prev.west,   0);
-    let dEast   = Math.max(dp.east   - prev.east,   0);
+    let dWest   = Math.max(dp.west - prev.west, 0);
+    let dEast   = Math.max(dp.east - prev.east, 0);
     let dCircle = Math.max(dp.circle - prev.circle, 0);
-
-    // 根据正态随机分布，给这些新进场的“离场时间”
     for (let i = 0; i < dWest; i++) {
-      let duration = randNormal(MEAN_HOURS, STD_HOURS); // hour
+      let duration = randNormal(MEAN_HOURS, STD_HOURS);
       let exitTime = new Date(currTime.getTime() + duration * 3600000);
       peopleWest.push({ exitTime });
     }
@@ -244,235 +198,245 @@ function processCSV(csvText) {
       let exitTime = new Date(currTime.getTime() + duration * 3600000);
       peopleCircle.push({ exitTime });
     }
-
-    // 当前时刻对应的在场人数
     xAxis.push(formatTime(currTime));
     timeData.push(currTime);
     westOcc.push(peopleWest.length);
     eastOcc.push(peopleEast.length);
     circleOcc.push(peopleCircle.length);
-
     prev = dp;
   });
 
-  // =========== 将结果存到全局对象，以更新实时显示等 ===========
   globalOccupancies.timeData  = timeData;
   globalOccupancies.westOcc   = westOcc;
   globalOccupancies.eastOcc   = eastOcc;
   globalOccupancies.circleOcc = circleOcc;
-
-  // 更新顶部三个“液晶数值”的实时显示
   updateRealtimeDisplay();
 
-  // =========== 在可视化前，根据营业时间设置“关门时段”数据为 null ===========
   for (let i = 0; i < timeData.length; i++) {
     let t = timeData[i];
-    // West/East
-    if (!isOpenWestEast(t)) {
-      westOcc[i] = null;
-      eastOcc[i] = null;
-    }
-    // Circle
-    if (!isOpenCircle(t)) {
-      circleOcc[i] = null;
-    }
+    if (!isOpenWestEast(t)) { westOcc[i] = null; eastOcc[i] = null; }
+    if (!isOpenCircle(t)) { circleOcc[i] = null; }
   }
-
-  // =========== 进一步做 SG 平滑处理 ===========
-  // 固定卷积核：窗口长度 7，三次多项式拟合
   const sgKernel = [-2, 3, 6, 7, 6, 3, -2].map(x => x / 21);
   const smoothWestOcc   = sgSmooth(westOcc,   sgKernel).map(v => Math.max(0, Math.floor(v || 0)));
   const smoothEastOcc   = sgSmooth(eastOcc,   sgKernel).map(v => Math.max(0, Math.floor(v || 0)));
   const smoothCircleOcc = sgSmooth(circleOcc, sgKernel).map(v => Math.max(0, Math.floor(v || 0)));
-
-  // 绘图
   renderChart(xAxis, smoothWestOcc, smoothEastOcc, smoothCircleOcc);
 }
 
 /**
- * 更新实时显示：比较当前时刻人数 & 若干分钟前的差异
+ * 更新实时显示
  */
 function updateRealtimeDisplay() {
   const timeData = globalOccupancies.timeData;
   if (!timeData.length) return;
-
   const currentIndex = timeData.length - 1;
-  // 当前时间点
-  // const currentTime = timeData[currentIndex];  // BUG: 会出现永远无法下班的情况
-  // const currentTime = new Date();  // 直接取系统时间  // 添加下一行的代码，就可以随时手动设置时间
   const currentTime = (typeof debugTime !== 'undefined') ? debugTime : new Date();
 
-
-  // 计算与 5 分钟前的差值（你已有的逻辑）
   function computeDiff(arr) {
     const currentVal = arr[currentIndex];
     const targetTime = new Date(currentTime.getTime() - 15 * 60000);
     let prevIndex = 0;
     for (let i = 0; i < timeData.length; i++) {
-      if (timeData[i] <= targetTime) {
-        prevIndex = i;
-      }
+      if (timeData[i] <= targetTime) prevIndex = i;
     }
-    const prevVal = arr[prevIndex];
-    return (currentVal || 0) - (prevVal || 0);
+    return (currentVal || 0) - (arr[prevIndex] || 0);
   }
-
   const diffWest   = computeDiff(globalOccupancies.westOcc);
   const diffEast   = computeDiff(globalOccupancies.eastOcc);
   const diffCircle = computeDiff(globalOccupancies.circleOcc);
 
-  // 根据 ID 更新展示
-function updateElement(id, value, diff) {
-  let container = document.getElementById(id);
-  if (!container) return;
-
-  // 判断营业状态
-  let isOpen = false;
-  if (id.includes('west') || id.includes('east')) {
-    isOpen = isOpenWestEast(currentTime);
-  } else if (id.includes('circle')) {
-    isOpen = isOpenCircle(currentTime);
+  function updateElement(id, value, diff) {
+    let container = document.getElementById(id);
+    if (!container) return;
+    let isOpen = id.includes('west') || id.includes('east')
+      ? isOpenWestEast(currentTime)
+      : isOpenCircle(currentTime);
+    let labelColor = isOpen ? "#00ffc4" : "#767676";
+    container.style.boxShadow = isOpen ? "" : "none";
+    let badgeHTML = isOpen
+      ? `<span class="realtime-status-badge realtime-open">OPEN</span>`
+      : `<span class="realtime-status-badge realtime-closed">CLOSED</span>`;
+    let displayHTML = isOpen
+      ? `<span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}${badgeHTML}</span><br>
+         <span class="realtime-count">${value || 0}${diff > 0 ? `<span class="realtime-indicator-up">▲${diff}</span>` : diff < 0 ? `<span class="realtime-indicator-down">▼${Math.abs(diff)}</span>` : `<span class="realtime-indicator-none">┉</span>`}</span>`
+      : `<span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}</span><br>
+         <span class="realtime-count" style="color: red;">CLOSED</span>`;
+    container.innerHTML = displayHTML;
   }
-
-  // 如果未营业，则设置 label 为灰色，且移除 box-shadow
-  let labelColor = isOpen ? "#00ffc4" : "#767676";
-  container.style.boxShadow = isOpen ? "" : "none";
-
-  // 构建状态徽章
-  let badgeHTML = '';
-  if (isOpen) {
-    badgeHTML = `<span class="realtime-status-badge realtime-open">OPEN</span>`;
-  } else {
-    badgeHTML = `<span class="realtime-status-badge realtime-closed">CLOSED</span>`;
-  }
-
-  // 根据状态构建显示内容
-  let displayHTML = '';
-  if (isOpen) {
-    let trendHTML = '';
-    if (diff > 0) {
-      trendHTML = `<span class="realtime-indicator-up">▲${diff}</span>`;
-    } else if (diff < 0) {
-      trendHTML = `<span class="realtime-indicator-down">▼${Math.abs(diff)}</span>`;
-    } else {
-      trendHTML = `<span class="realtime-indicator-none">┉</span>`;
-    }
-    displayHTML = `
-      <span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}${badgeHTML}</span><br>
-      <span class="realtime-count">
-        ${value || 0}${trendHTML}
-      </span>
-    `;
-  } else {
-    // 未营业时只显示 CLOSED
-    displayHTML = `
-      <span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}</span><br>
-      <span class="realtime-count" style="color: red;">CLOSED</span>
-    `;
-  }
-  container.innerHTML = displayHTML;
-}
-
-
-  // 分别更新 West/East/Circle
-  updateElement("realtime-west",   globalOccupancies.westOcc[currentIndex],   diffWest);
-  updateElement("realtime-east",   globalOccupancies.eastOcc[currentIndex],   diffEast);
+  updateElement("realtime-west", globalOccupancies.westOcc[currentIndex], diffWest);
+  updateElement("realtime-east", globalOccupancies.eastOcc[currentIndex], diffEast);
   updateElement("realtime-circle", globalOccupancies.circleOcc[currentIndex], diffCircle);
 }
 
-
 /**
  * 用 ECharts 进行可视化
- * 在同一个图表展示 West/East/Circle 三条线
  */
 function renderChart(xAxis, wData, eData, cData) {
   if (!xAxis.length) {
-    document.getElementById("chart").innerHTML =
-      "<p style='color:red;'>No data to display.</p>";
+    document.getElementById("chart").innerHTML = "<p style='color:red;'>No data to display.</p>";
     return;
   }
   let chartDom = document.getElementById('chart');
-  chartDom.innerHTML = ''; // 清空再绘制
+  chartDom.innerHTML = '';
   let myChart = echarts.init(chartDom);
-
-  // 当前时间（如 "17:02"）
   const now = formatTime(new Date());
-
-  // 如果 xAxis 里还没有当前时间，则插入（可选）
-  if (!xAxis.includes(now)) {
-    xAxis.push(now);
-    // 未必需要排序；若要严格按时间顺序，则需一起对 wData/eData/cData 插入点或重排
-  }
-
-  // 只显示部分标签
+  if (!xAxis.includes(now)) xAxis.push(now);
   const showTimes = ['06:00','09:00','12:00','15:00','18:00','21:00','22:00','23:00'];
-
   let option = {
     tooltip: { trigger: 'axis' },
-    legend: {
-      data: ['West', 'East', 'Circle']
-    },
+    legend: { data: ['West', 'East', 'Circle'] },
     xAxis: {
       type: 'category',
       data: xAxis,
       axisLabel: {
-        // fontSize: 12,  // 这里调整 X 轴刻度字体大小
         rotate: 45,
-        formatter: function(value) {
-          // 只在 showTimes 列表中才显示
-          return showTimes.includes(value) ? value : '';
-        }
+        formatter: function(value) { return showTimes.includes(value) ? value : ''; }
       }
     },
     yAxis: { type: 'value' },
-    grid: {
-      left: '10%',
-      right: '10%',
-      bottom: '15%'
-    },
+    grid: { left: '10%', right: '10%', bottom: '15%' },
     series: [
-      {
-        name: 'West',
-        type: 'line',
-        smooth: true,
-        data: wData,
-        itemStyle: { color: '#F2A2A2' },    // 柔和粉
-        lineStyle: { color: '#F2A2A2' }
-      },
-      {
-        name: 'East',
-        type: 'line',
-        smooth: true,
-        data: eData,
-        itemStyle: { color: '#C5AAFF' },    // 淡紫
-        lineStyle: { color: '#C5AAFF' }
-      },
-      {
-        name: 'Circle',
-        type: 'line',
-        smooth: true,
-        data: cData,
-        itemStyle: { color: '#B5E8BC' },    // 浅绿
-        lineStyle: { color: '#B5E8BC' },
-        // 在最后一个系列中加垂直虚线 markLine
+      { name: 'West', type: 'line', smooth: true, data: wData, itemStyle: { color: '#F2A2A2' }, lineStyle: { color: '#F2A2A2' } },
+      { name: 'East', type: 'line', smooth: true, data: eData, itemStyle: { color: '#C5AAFF' }, lineStyle: { color: '#C5AAFF' } },
+      { name: 'Circle', type: 'line', smooth: true, data: cData, itemStyle: { color: '#B5E8BC' }, lineStyle: { color: '#B5E8BC' },
         markLine: {
           symbol: 'none',
-          lineStyle: {
-            type: 'dashed',
-            color: '#f68181'
-          },
-          data: [
-            { xAxis: now } // 用 xAxis 属性指定竖线的位置
-          ]
+          lineStyle: { type: 'dashed', color: '#f68181' },
+          data: [{ xAxis: now }]
         }
       }
     ]
   };
-
   myChart.setOption(option);
 }
 
-
-
-// 页面加载后立即执行
+// 页面加载后立即执行数据加载
 window.addEventListener('DOMContentLoaded', loadData);
+
+/* =====================
+   以下为烟花动画效果代码
+   （原代码中，每隔100ms添加一个烟花，并通过 requestAnimationFrame 进行动画更新）
+=====================*/
+
+// 获取 canvas 元素及上下文
+const canvas = document.getElementById('fireworksCanvas');
+const ctx = canvas.getContext('2d');
+
+// 设置 canvas 尺寸
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+let fireworks = [];
+
+// 烟花类
+class Firework {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = canvas.height;
+    this.radius = 1;
+    this.speed = 8;
+    this.color = 'white';
+    this.exploded = false;
+    this.particles = [];
+    this.explosionHeight = Math.random() * (canvas.height * 0.3) + (canvas.height * 0.5);
+    this.initialAlpha = 1;
+    this.currentAlpha = this.initialAlpha;
+  }
+  update() {
+    if (!this.exploded) {
+      this.y -= this.speed;
+      this.currentAlpha -= 0.005;
+      if (this.currentAlpha < 0) this.currentAlpha = 0;
+      if (this.y <= this.explosionHeight) this.explode();
+    } else {
+      this.particles.forEach((particle, index) => {
+        particle.update();
+        if (particle.alpha <= 0) {
+          this.particles.splice(index, 1);
+        }
+      });
+    }
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.currentAlpha;
+    ctx.fill();
+    ctx.closePath();
+    if (this.exploded) {
+      this.particles.forEach(particle => particle.draw());
+    }
+  }
+  explode() {
+    this.exploded = true;
+    for (let i = 0; i < 100; i++) {
+      this.particles.push(new Particle(this.x, this.y));
+    }
+  }
+}
+
+// 粒子类
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.radius = 2;
+    this.speedX = Math.random() * 5 - 2;
+    this.speedY = Math.random() * 5 - 2;
+    this.color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+    this.alpha = 1.5;
+    this.fade = Math.random() * 0.05 + 0.01;
+  }
+  update() {
+    this.x += this.speedX;
+    this.y += this.speedY;
+    this.alpha -= this.fade;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.alpha;
+    ctx.fill();
+    ctx.closePath();
+  }
+}
+
+// 动画函数
+function animateFireworks() {
+  // 使用半透明背景覆盖整个画布，实现拖影效果
+// 保存当前的复合操作
+const prevComposite = ctx.globalCompositeOperation;
+// 使用 'destination-out' 模式，在目标像素中减去alpha值
+ctx.globalCompositeOperation = 'destination-out';
+// 使用较低的不透明度来擦除旧的图像
+ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+// 恢复原先的复合操作
+ctx.globalCompositeOperation = prevComposite;
+
+
+  fireworks.forEach((firework, index) => {
+    firework.update();
+    firework.draw();
+    if (firework.exploded && firework.particles.length === 0) {
+      fireworks.splice(index, 1);
+    }
+  });
+  requestAnimationFrame(animateFireworks);
+}
+
+// 初始化烟花：每隔100ms添加一个烟花
+function initFireworks() {
+  setInterval(() => {
+    fireworks.push(new Firework());
+  }, 226);
+  animateFireworks();
+}
+initFireworks();
