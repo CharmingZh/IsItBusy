@@ -439,4 +439,15 @@ function initFireworks() {
   }, 226 + 100);
   animateFireworks();
 }
-initFireworks();
+(function() {
+  const now = new Date();
+  if (now.getMonth() === 1 && now.getDate() === 26) {
+    // 只有在2月26日才启动烟花效果
+    initFireworks();
+  } else {
+    // 非2月26日时可以隐藏 canvas
+    const canvas = document.getElementById('fireworksCanvas');
+    if (canvas) canvas.style.display = 'none';
+  }
+})();
+
