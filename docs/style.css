@@ -35,8 +35,6 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
   padding-left: env(safe-area-inset-left);
   background-color: rgba(246, 255, 243, 0.95);
-  max-width: 700px; /* 或其他适合的宽度 */
-  margin: 0 auto;
 }
 
 /* ========== 顶部区域 header ========== */
@@ -48,7 +46,7 @@ header {
 }
 header h2 {
   margin: 0.2rem 0;
-  font-size: 1.2rem;
+  font-size: 1.5vh;
   color: #094b0a;
 }
 
@@ -57,7 +55,7 @@ header h2 {
   display: flex;
   justify-content: center;
   gap: 15px;
-  height: 100px;
+  height: 9vh;
   margin-top: 0.3rem;
 }
 
@@ -70,9 +68,11 @@ header h2 {
   border-radius: 17px;
   padding: 0.2rem 0.3rem;
   font-family: 'VT323', monospace;
-  font-size: 1rem;
+  font-size: 0.75vh;
   text-align: center;
-  min-width: 100px;
+  /*min-width: 100px;*/
+  min-width: 15vh;
+  /*font-size: 30%;*/
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -91,38 +91,47 @@ header h2 {
 }
 
 .realtime-label {
-  font-size: 3rem;
+  /*font-size: 3rem;*/
+  font-size: 5vh;
   color: #00ffc4;
   margin-bottom: -17px;
 }
 
 .realtime-count {
   font-family: 'Doto', sans-serif;
-  font-size: 2.5rem;
+  /*font-size: 2.5rem;*/
+  font-size: 3vh;
+  /*font-size: 30%;*/
 }
 
 .realtime-indicator-up {
   font-family: 'Doto', sans-serif;
   color: #d9534f;
-  font-size: 0.75rem;
+  /*font-size: 0.75rem;*/
+  font-size: 2vh;
+  /*font-size: 30%;*/
 }
 
 .realtime-indicator-down {
   font-family: 'Doto', sans-serif;
   color: #32CD32;
-  font-size: 0.75rem;
+  font-size: 2vh;
+  /*font-size: 30%;*/
 }
 
 .realtime-indicator-none {
   font-family: 'Doto', sans-serif;
   color: #767676;
-  font-size: 0.75rem;
+  font-size: 2vh;
+  /*font-size: 30%;*/
 }
 
 .realtime-status-badge {
   display: inline-block;
-  font-size: 0.5rem;
-  margin-left: 0.3rem;
+  font-size: 1.5vh;
+  width: 3.5vh;
+  /*font-size: 30%;*/
+  /*margin-left: 0.3rem;*/
   padding: 0.1rem 0.2rem;
   border-radius: 5px;
   font-weight: bold;
@@ -170,8 +179,6 @@ header h2 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  max-width: 900px;
-  margin: 0 auto;
 }
 
 #chart {
@@ -187,10 +194,11 @@ header h2 {
 footer {
   position: relative; /* 让 footer 成为定位容器 */
   text-align: center;
-  font-size: 0.6rem;
+  /*font-size: 0.6rem;*/
+  font-size: 1vh;
   color: #555;
   background: rgba(246, 255, 243, 0.95);
-  padding: 0.3rem 0.2rem;
+  padding: 0.3vh 0.2vh;
 }
 
 /*#fireworksCanvas {*/
@@ -208,14 +216,27 @@ footer {
   color: #960226;
 }
 
-/* ========== 小屏幕自适应 ========== */
+ /*========== 小屏幕自适应 ==========*/
 @media (max-width: 768px) {
   header h2 {
     font-size: 1.2rem;
   }
+  #realtime-container {
+  height: 8.5vh;
+}
+  .realtime-box-west,
+.realtime-box-circle,
+.realtime-box-east {
+  padding: 0.2rem 0.3rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.75vh;
+  text-align: center;
+  /*min-width: 100px;*/
+  min-width: 17vh;
+}
   .realtime-label,
   .realtime-count {
-    font-size: 1.2rem;
+    font-size: 4vh;
   }
   #about-button {
     width: 25px;
@@ -227,6 +248,45 @@ footer {
     font-size: 0.5rem;
   }
 }
+
+
+/*!* 仅针对真正的电脑端（不包含大屏手机/平板） *!*/
+/*@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {*/
+/*  .main-container {*/
+/*    max-width: 1200px; !* 设定合理的最大宽度 *!*/
+/*    margin: 0 auto; !* 居中 *!*/
+/*  }*/
+
+/*  .content {*/
+/*    max-width: 1200px;*/
+/*    margin: 0 auto;*/
+/*  }*/
+
+/*  #chart {*/
+/*    max-width: 1000px;*/
+/*  }*/
+/*}*/
+
+/*!* 平板设备（含部分大屏手机，如 iPhone 16 Pro Max） *!*/
+/*@media (min-width: 768px) and (max-width: 1366px) and (hover: none) {*/
+/*  .main-container {*/
+/*    max-width: 90%;*/
+/*    margin: 0 auto;*/
+/*  }*/
+/*}*/
+
+/*!* 小屏手机（≤767px） *!*/
+/*@media (max-width: 767px) {*/
+/*  .main-container {*/
+/*    width: 100%;*/
+/*    padding: 0 10px;*/
+/*  }*/
+
+/*  .content {*/
+/*    width: 100%;*/
+/*  }*/
+/*}*/
+
 
 /* ========== 烟花动画 canvas 样式  ========== */
 #fireworksCanvas {
