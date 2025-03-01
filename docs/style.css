@@ -439,6 +439,7 @@ footer {
   p {
     margin: 0.1dvh;
   }
+
 }
 
 /* iPad 横屏*/
@@ -491,6 +492,11 @@ footer {
   }
   p {
     margin: 0.1dvh;
+  }
+  /* 弹窗采用上下左右各留一定间距 */
+  #hours-popup {
+    width: 70dvh !important;     /* 占据屏幕90%宽度 */
+    height: 80dvh !important;    /* 占据屏幕80%高度 */
   }
 }
 
@@ -551,6 +557,12 @@ footer {
   }
   p {
     margin: 0.1dvh;
+  }
+
+  /* 弹窗采用上下左右各留一定间距 */
+  #hours-popup {
+    width: 70dvh !important;
+    height: 80dvh !important;    /* 占据屏幕80%高度 */
   }
 }
 

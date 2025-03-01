@@ -59,19 +59,34 @@
       </div>
 
       <!-- 底部说明区域 -->
-      <footer>
-        <!--      <canvas id="fireworksCanvas"></canvas>-->
-        <!-- 新增：系统运行时长 -->
-        <p id="system-runtime">Running for: --</p>
-        <div id="data-refresh-info" class="data-info">
-          （Last update: <span id="last-update">--:--</span>）
+      <footer style="background: rgba(246, 255, 243, 0.15); padding: 20px; text-align: center; font-size: 14px; color: #666;">
+        <!-- 引入 FontAwesome 样式 (如果页面中已有引入，可忽略) -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+              integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
+              crossorigin="anonymous">
+
+        <div style="display: inline-block; padding: 5px 10px; background: #fff; margin-bottom: 1px; border-radius: 8px;">
+          <!-- 系统运行时长 -->
+          <p id="system-runtime" style="margin: 0; font-weight: bold;">Running for: --</p>
+          <!-- 数据刷新信息 -->
+          <p id="data-refresh-info" style="margin: 5px 0 10px; font-size: 12px;">（Last update: <span id="last-update">--:--</span>）</p>
+          <!-- Busuanzi 统计 -->
+          <p style="margin: 0;">
+            <i class="fas fa-globe" style="margin-right: 5px;"></i>
+            本站总访问量：<span id="busuanzi_value_site_pv"></span> 次
+          </p>
         </div>
 
-        <script>
+        <p class="disclaimer" style="margin: 5px 0; color: #960226;">Predictions may vary. Refer to actual data.</p>
+        <p style="margin: 5px 0;">Thanks to MSU for the <a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank" style="color: #007bff;">data</a> ❤. This project is for personal study and planning only.</p>
+        <p style="margin: 5px 0;"><b>Contact📧: zhan2374 [at] msu [dot] edu</b></p>
 
+        <!-- 异步加载 Busuanzi 统计脚本 -->
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+        <script>
           // 系统启动时间：2025-02-20 22:47:07
           const systemStartTime = new Date("2025-02-20T22:47:07");
-
           function updateRuntime() {
             const now = new Date();
             const diff = now - systemStartTime;
@@ -79,16 +94,14 @@
             const minutes = Math.floor(diff / (1000 * 60)) % 60;
             const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s; `;
+            document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s;`;
           }
           updateRuntime();
           setInterval(updateRuntime, 1000);
         </script>
-
-        <p class="disclaimer">Predictions may vary. Refer to actual data.</p>
-        <p>Thanks to MSU for the <a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">data</a>❤. This project is for personal study and planning only.</p>
-        <p><b>Contact📧: zhan2374 [at] msu [dot] edu</b></p>
       </footer>
+
+
     </div>
 
     <!-- 引入业务逻辑及烟花动画的 JS（合并所有 JS 逻辑到 main.js 中） -->
