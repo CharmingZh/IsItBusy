@@ -4,7 +4,7 @@
  *********************************************/
 // 调试变量：
 // 取消下面一行的注释，即可在调试时使用指定时间
-// let debugTime = new Date("2025-03-02T18:00:00");
+let debugTime = new Date("2025-02-26T22:00:00");
 
 // 辅助函数：返回当前时间，如果 debugTime 不为 null，则返回 debugTime，否则返回真实当前时间
 function getCurrentTime() {

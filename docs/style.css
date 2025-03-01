@@ -16,6 +16,7 @@ body {
   width: 100%;
   background: transparent;
   font-family: 'Arial', sans-serif;
+  background-color: rgba(246, 255, 243, 0.95);
   /*font-size: 17px;*/
   overflow: hidden;
 }
@@ -329,15 +330,107 @@ footer {
 /*========== 针对不同屏幕尺寸的自适应调整 ==========*/
 /* iPad 竖屏*/
 @media (min-width: 451px) and (max-width: 1248px) {
-  header {
-    background: rgb(0, 11, 255);
+  header h2 {
+    font-size: 2.5vh;
+    color: #094b0a;
+  }
+
+  #realtime-container {
+    gap: 1.5dvh;
+    height: 10dvh;
+  }
+  .realtime-box-west,
+  .realtime-box-circle,
+  .realtime-box-east {
+    font-size: 2dvh;
+    min-width: 15dvh;
+  }
+  .realtime-label {
+    font-size: 5vh;
+    color: #00ffc4;
+    margin-bottom: -2.5dvh;
+  }
+  .realtime-count {
+    font-size: 4dvh;
+  }
+  .realtime-status-badge {
+    font-size: 1.5dvh;
+    width: 3.75dvh;
+  }
+  .closed_word {
+    font-size: 2.5vh;
+  }
+  .realtime-indicator-up {
+    font-size: 2.5dvh;
+  }
+
+  .realtime-indicator-down {
+    font-size: 2.5dvh;
+  }
+
+  .realtime-indicator-none {
+    font-size: 2.5dvh;
+    margin-left: 0.25dvh;
+  }
+  footer {
+    font-size: 1.5dvh;
+    padding: 0.5dvh;
+  }
+  p {
+    margin: 0.1dvh;
   }
 }
 
 /* iPad 横屏*/
 @media (min-width: 451px) and (max-width: 1248px) {
-  header {
-    background: rgb(0, 11, 255);
+  header h2 {
+    font-size: 2.5vh;
+    color: #094b0a;
+  }
+
+  #realtime-container {
+    gap: 1.5dvh;
+    height: 10dvh;
+  }
+  .realtime-box-west,
+  .realtime-box-circle,
+  .realtime-box-east {
+    font-size: 2dvh;
+    min-width: 15dvh;
+  }
+  .realtime-label {
+    font-size: 5vh;
+    color: #00ffc4;
+    margin-bottom: -2.5dvh;
+  }
+  .realtime-count {
+    font-size: 4dvh;
+  }
+  .realtime-status-badge {
+    font-size: 1.5dvh;
+    width: 3.75dvh;
+  }
+  .closed_word {
+    font-size: 2.5vh;
+  }
+  .realtime-indicator-up {
+    font-size: 2.5dvh;
+  }
+
+  .realtime-indicator-down {
+    font-size: 2.5dvh;
+  }
+
+  .realtime-indicator-none {
+    font-size: 2.5dvh;
+    margin-left: 0.25dvh;
+  }
+  footer {
+    font-size: 1.5dvh;
+    padding: 0.5dvh;
+  }
+  p {
+    margin: 0.1dvh;
   }
 }
 
@@ -345,8 +438,59 @@ footer {
 /*========== 针对不同屏幕尺寸的自适应调整 ==========*/
 /* 电脑端 */
 @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
-  header {
-    background: rgb(255, 0, 0);
+  .main-container {
+    background: rgba(246, 255, 243, 0.95);
+    max-width: 60dvh;
+    margin: 0 auto;
+  }
+  header h2 {
+    font-size: 2.5vh;
+    color: #094b0a;
+  }
+
+  #realtime-container {
+    gap: 1.5dvh;
+    height: 10dvh;
+  }
+  .realtime-box-west,
+  .realtime-box-circle,
+  .realtime-box-east {
+    font-size: 2dvh;
+    min-width: 15dvh;
+  }
+  .realtime-label {
+    font-size: 5vh;
+    color: #00ffc4;
+    margin-bottom: -2.5dvh;
+  }
+  .realtime-count {
+    font-size: 4dvh;
+  }
+  .realtime-status-badge {
+    font-size: 1.5dvh;
+    width: 3.75dvh;
+  }
+  .closed_word {
+    font-size: 2.5vh;
+  }
+  .realtime-indicator-up {
+    font-size: 2.5dvh;
+  }
+
+  .realtime-indicator-down {
+    font-size: 2.5dvh;
+  }
+
+  .realtime-indicator-none {
+    font-size: 2.5dvh;
+    margin-left: 0.25dvh;
+  }
+  footer {
+    font-size: 1.5dvh;
+    padding: 0.5dvh;
+  }
+  p {
+    margin: 0.1dvh;
   }
 }
 
