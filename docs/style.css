@@ -16,7 +16,7 @@ body {
   width: 100%;
   background: transparent;
   font-family: 'Arial', sans-serif;
-  font-size: 17px;
+  /*font-size: 17px;*/
   overflow: hidden;
 }
 
@@ -216,82 +216,50 @@ footer {
   color: #960226;
 }
 
- /*========== 小屏幕自适应 ==========*/
-@media (max-width: 768px) {
-  header h2 {
-    font-size: 1.2rem;
+/*========== 针对不同屏幕尺寸的自适应调整 ==========*/
+
+/*iPhone 14 && iPhone 13 (390 px x 844 px)*/
+@media (max-width: 400px) {
+  body {
+    background-color: #000000; /*只是用于调试不同设备的，用完了记得注释掉*/
   }
-  #realtime-container {
-  height: 8.5vh;
+
 }
-  .realtime-box-west,
-.realtime-box-circle,
-.realtime-box-east {
-  padding: 0.2rem 0.3rem;
-  font-family: 'VT323', monospace;
-  font-size: 1.75vh;
-  text-align: center;
-  /*min-width: 100px;*/
-  min-width: 17vh;
-}
-  .realtime-label,
-  .realtime-count {
-    font-size: 4vh;
-  }
-  #about-button {
-    width: 25px;
-    height: 25px;
-    font-size: 1rem;
-    line-height: 25px;
-  }
-  footer {
-    font-size: 0.5rem;
+
+/*iPhone 16 Pro Max (1290 px x 2796 px)*/
+@media (min-width: 400px) and (max-width: 450px){
+  body {
+    background-color: #960226;
   }
 }
 
+/* iPad 竖屏*/
+@media (min-width: 451px) and (max-width: 1248px) {
+  header {
+    background: rgb(0, 11, 255);
+  }
+}
 
-/*!* 仅针对真正的电脑端（不包含大屏手机/平板） *!*/
-/*@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {*/
-/*  .main-container {*/
-/*    max-width: 1200px; !* 设定合理的最大宽度 *!*/
-/*    margin: 0 auto; !* 居中 *!*/
-/*  }*/
+/* iPad 横屏*/
+@media (min-width: 451px) and (max-width: 1248px) {
+  header {
+    background: rgb(0, 11, 255);
+  }
+}
 
-/*  .content {*/
-/*    max-width: 1200px;*/
-/*    margin: 0 auto;*/
-/*  }*/
-
-/*  #chart {*/
-/*    max-width: 1000px;*/
-/*  }*/
-/*}*/
-
-/*!* 平板设备（含部分大屏手机，如 iPhone 16 Pro Max） *!*/
-/*@media (min-width: 768px) and (max-width: 1366px) and (hover: none) {*/
-/*  .main-container {*/
-/*    max-width: 90%;*/
-/*    margin: 0 auto;*/
-/*  }*/
-/*}*/
-
-/*!* 小屏手机（≤767px） *!*/
-/*@media (max-width: 767px) {*/
-/*  .main-container {*/
-/*    width: 100%;*/
-/*    padding: 0 10px;*/
-/*  }*/
-
-/*  .content {*/
-/*    width: 100%;*/
-/*  }*/
-/*}*/
+/* 电脑端 */
+@media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+  header {
+    background: rgb(255, 0, 0);
+  }
+}
 
 
+/*专属于2月26日的特别彩蛋*/
 /* ========== 烟花动画 canvas 样式  ========== */
 #fireworksCanvas {
   position: fixed;
-  top: 0vh;     /* 从 85vh 开始，即底部15% */
+  top: 0;     /* 从 85vh 开始，即底部15% */
   left: 0;
   width: 100%;
   height: 100vh;  /* 高度为 15vh */
