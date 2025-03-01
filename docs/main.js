@@ -261,7 +261,7 @@ function updateRealtimeDisplay() {
       ? `<span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}${badgeHTML}</span><br>
          <span class="realtime-count">${value || 0}${diff > 0 ? `<span class="realtime-indicator-up">▲${diff}</span>` : diff < 0 ? `<span class="realtime-indicator-down">▼${Math.abs(diff)}</span>` : `<span class="realtime-indicator-none">┉</span>`}</span>`
       : `<span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}</span><br>
-         <span class="realtime-count" style="color: red;">CLOSED</span>`;
+         <span class="realtime-count closed_word">CLOSED</span>`;
     container.innerHTML = displayHTML;
   }
   updateElement("realtime-west", globalOccupancies.westOcc[currentIndex], diffWest);
@@ -295,7 +295,7 @@ function renderChart(xAxis, wData, eData, cData) {
       }
     },
     yAxis: { type: 'value' },
-    grid: { left: '10%', right: '10%', bottom: '15%' },
+    grid: { top: '12%', left: '10%', right: '10%', bottom: '12%' },
     series: [
       { name: 'West', type: 'line', smooth: true, data: wData, itemStyle: { color: '#F2A2A2' }, lineStyle: { color: '#F2A2A2' } },
       { name: 'East', type: 'line', smooth: true, data: eData, itemStyle: { color: '#C5AAFF' }, lineStyle: { color: '#C5AAFF' } },
@@ -451,3 +451,19 @@ function initFireworks() {
   }
 })();
 
+
+
+// 系统启动时间：2025-02-20 22:47:07
+const systemStartTime = new Date("2025-02-20T22:47:07");
+
+function updateRuntime() {
+  const now = new Date();
+  const diff = now - systemStartTime;
+  const seconds = Math.floor(diff / 1000) % 60;
+  const minutes = Math.floor(diff / (1000 * 60)) % 60;
+  const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s; `;
+}
+updateRuntime();
+setInterval(updateRuntime, 1000);

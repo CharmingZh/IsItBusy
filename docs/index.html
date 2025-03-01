@@ -45,8 +45,8 @@
           <span class="realtime-count">--</span>
         </div>
       </div>
-      <!-- 保持原有 onclick 不变 -->
-      <button id="about-button" onclick="window.open('about.html', '_blank')">≡</button>
+<!--      &lt;!&ndash; 保持原有 onclick 不变 &ndash;&gt;-->
+<!--      <button id="about-button" onclick="window.open('about.html', '_blank')">≡</button>-->
     </header>
 
     <!-- 中间内容区域 -->
@@ -60,26 +60,8 @@
       <!-- 新增：系统运行时长 -->
       <p id="system-runtime">Running for: --</p>
       <div id="data-refresh-info" class="data-info">
-          Last update: <span id="last-update">--:--</span>
-          (refreshes every 5 min, may be delayed)
+          （Last update: <span id="last-update">--:--</span>）
       </div>
-
-      <script>
-        // 系统启动时间：2025-02-20 22:47:07
-        const systemStartTime = new Date("2025-02-20T22:47:07");
-
-        function updateRuntime() {
-          const now = new Date();
-          const diff = now - systemStartTime;
-          const seconds = Math.floor(diff / 1000) % 60;
-          const minutes = Math.floor(diff / (1000 * 60)) % 60;
-          const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
-          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-          document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s; `;
-        }
-        updateRuntime();
-        setInterval(updateRuntime, 1000);
-      </script>
 
       <p class="disclaimer">Predictions may vary. Refer to actual data.</p>
       <p>Thanks to MSU for the <a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">data</a>❤. This project is for personal study and planning only.</p>
