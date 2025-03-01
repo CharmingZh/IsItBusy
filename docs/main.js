@@ -513,6 +513,428 @@ function renderChart(xAxis, wData, eData, cData) {
 // 页面加载后立即执行数据加载
 window.addEventListener('DOMContentLoaded', loadData);
 
+
+
+// ── 弹窗与图表的逻辑（合并事件绑定） ─────────────────────────────
+document.addEventListener("DOMContentLoaded", function () {
+  const toggleBtn = document.getElementById("toggle-hours-btn");
+  const hoursPopup = document.getElementById("hours-popup");
+  const closeBtn = document.getElementById("close-hours-btn");
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  const springChartDiv = document.getElementById("spring-chart");
+  const normalChartDiv = document.getElementById("normal-chart");
+
+  // 切换 Tab 按钮事件
+  tabBtns.forEach(btn => {
+    btn.addEventListener("click", function () {
+      // 清除所有 tab 的 active 状态
+      tabBtns.forEach(b => b.classList.remove("active"));
+      this.classList.add("active");
+      const target = this.getAttribute("data-target");
+      if (target === "spring-chart") {
+        springChartDiv.style.display = "block";
+        normalChartDiv.style.display = "none";
+        renderSpringChart();
+      } else {
+        springChartDiv.style.display = "none";
+        normalChartDiv.style.display = "block";
+        renderNormalChart();
+      }
+    });
+  });
+
+  // 点击弹出按钮，显示弹窗并默认显示春假营业时间图表
+  toggleBtn.addEventListener("click", function () {
+    hoursPopup.style.display = "block";
+    springChartDiv.style.display = "block";
+    normalChartDiv.style.display = "none";
+    // 设置默认 Tab 样式
+    document.querySelector('.tab-btn[data-target="spring-chart"]').classList.add("active");
+    document.querySelector('.tab-btn[data-target="normal-chart"]').classList.remove("active");
+    renderSpringChart();
+  });
+
+  // 点击关闭按钮，隐藏弹窗
+  closeBtn.addEventListener("click", function () {
+    hoursPopup.style.display = "none";
+  });
+});
+
+
+// 构造正常营业时间数据（以一周 Monday～Sunday 顺序）
+function getNormalHours(facility, day) {
+  // day 为 Monday, Tuesday, …, Sunday
+  if (facility === "west" || facility === "east") {
+    switch(day) {
+      case "Monday":
+      case "Tuesday":
+      case "Wednesday":
+      case "Thursday":
+      case "Friday":
+        return [6, 23];
+      case "Saturday":
+        return [10, 21];
+      case "Sunday":
+        return [10, 22];
+    }
+  } else if (facility === "circle") {
+    switch(day) {
+      case "Monday":
+      case "Tuesday":
+      case "Wednesday":
+      case "Thursday":
+        return [9.5, 22]; // 09:30 -> 9.5
+      case "Friday":
+        return [9.5, 20];
+      case "Saturday":
+      case "Sunday":
+        return [12, 17];
+    }
+  }
+  return null;
+}
+
+// 固定横轴显示的时间标签（格式为 "HH:MM"），按升序排列
+const fixedTimes = ["06:00", "10:00", "12:00", "17:00", "20:00", "21:00", "22:00", "23:00"];
+
+const normalDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+
+// ──────────────────────────────────────────────
+// 修改后的正常营业时间图表渲染
+function renderNormalChart() {
+  let chartDom = document.getElementById("normal-chart");
+  let myChart = echarts.init(chartDom);
+  // 正常营业图表按 Monday～Sunday 顺序显示
+  const normalDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+  // 定义各设施及对应颜色与微调 offset
+  const facilities = [
+    { name: "West", key: "west", color: "#F2A2A2", offset: -0.2 },
+    { name: "East", key: "east", color: "#C5AAFF", offset: 0 },
+    { name: "Circle", key: "circle", color: "#B5E8BC", offset: 0.2 }
+  ];
+
+  let series = facilities.map(fac => {
+    let data = normalDays.map((day, index) => {
+      let hrs = getNormalHours(fac.key, day);
+      return hrs ? [index + fac.offset, hrs[0], hrs[1]] : null;
+    }).filter(d => d !== null);
+
+    return {
+      name: fac.name,
+      type: "custom",
+      renderItem: function (params, api) {
+        let yPos = api.value(0);
+        let start = api.coord([api.value(1), yPos]);
+        let end = api.coord([api.value(2), yPos]);
+        return {
+          type: "line",
+          shape: { x1: start[0], y1: start[1], x2: end[0], y2: end[1] },
+          style: { stroke: fac.color, lineWidth: 6 }
+        };
+      },
+      encode: { x: [1, 2], y: 0 },
+      data: data
+    };
+  });
+
+  let option = {
+    tooltip: { trigger: "item" },
+    grid: { left: '15%', right: '10%', top: '10%', bottom: '10%' },
+    xAxis: {
+      type: "value",
+      min: 6,
+      max: 23,
+      axisLine: { show: false },
+      interval: 1,
+      axisLabel: {
+        formatter: function(value) {
+          let h = Math.floor(value);
+          let m = Math.round((value - h) * 60);
+          let label = (h < 10 ? "0" + h : h) + ":" + (m === 0 ? "00" : (m < 10 ? "0" + m : m));
+          return fixedTimes.includes(label) ? label : "";
+        }
+      }
+    },
+    yAxis: {
+      type: "value",
+      min: -0.5,
+      max: normalDays.length - 0.5,
+      splitNumber: normalDays.length,
+      axisLabel: {
+        formatter: function(value) {
+          if (Math.abs(value - Math.round(value)) < 0.001) {
+            return normalDays[Math.round(value)] || "";
+          }
+          return "";
+        }
+      },
+      splitLine: { show: false },
+      axisTick: { show: true }
+    },
+    legend: { data: facilities.map(f => f.name) },
+    color: facilities.map(f => f.color),
+    series: series
+  };
+
+  myChart.setOption(option);
+}
+
+
+// ── 辅助函数 ─────────────────────────────
+
+// 将时间字符串转换为小时（小数）
+// 例如 "09:00:00" -> 9.0, "11:59:00" -> 11.9833（11 + 59/60）
+function parseTimeToHour(timeStr) {
+  let parts = timeStr.split(":").map(Number);
+  if (parts.length < 2) return null;
+  let h = parts[0],
+      m = parts[1] || 0,
+      s = parts[2] || 0;
+  return h + m/60 + s/3600;
+}
+
+// 定义星期数组，采用 Monday=0,...,Sunday=6
+const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+// 计算一个 Date 对象对应的“工作制”星期索引：使 Monday 为 0, …, Sunday 为 6
+function getWeekIndex(dateObj) {
+  return (dateObj.getDay() + 6) % 7;
+}
+
+// ── 解析 SPRING_BREAK_SCHEDULES 的函数 ─────────────────────────────
+
+/**
+ * 根据 SPRING_BREAK_SCHEDULES 配置解析指定 facility 在指定 day（例如 "Monday"）的营业时间。
+ * 如果配置中标记 closed，则返回 null；否则返回 [openHour, closeHour]（均为小数形式）。
+ */
+function getSpringHours(facility, day) {
+  let requestedIndex = weekDays.indexOf(day);
+  let schedules = SPRING_BREAK_SCHEDULES[facility];
+  if (!schedules) return null;
+
+  for (let schedule of schedules) {
+    if (schedule.date) {
+      // 单日配置
+      let d = new Date(schedule.date + "T00:00:00");
+      if (getWeekIndex(d) === requestedIndex) {
+        if (schedule.closed) return null;
+        return [ parseTimeToHour(schedule.start), parseTimeToHour(schedule.end) ];
+      }
+    } else if (schedule.startDate && schedule.endDate) {
+      // 区间配置
+      let s = new Date(schedule.startDate + "T00:00:00");
+      let e = new Date(schedule.endDate + "T23:59:59");
+      let startWeek = getWeekIndex(s);
+      let endWeek = getWeekIndex(e);
+      // 假定配置在同一周内（例如 Monday～Friday 或 Saturday～Sunday）
+      if (requestedIndex >= startWeek && requestedIndex <= endWeek) {
+        if (schedule.closed) return null;
+        return [ parseTimeToHour(schedule.start), parseTimeToHour(schedule.end) ];
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * 获取代表性日期，用于构造纵轴标签。
+ * 对于 facility（例如 "west"），遍历 SPRING_BREAK_SCHEDULES[facility]，
+ * 如果存在 startDate/endDate 区间且请求的 weekday（如 "Monday"）落在该区间内，
+ * 则返回：new Date(startDate + offset)，其中 offset = requestedIndex - getWeekIndex(startDate)。
+ * 如果配置中采用单日配置，则直接返回该日期。
+ */
+function getRepresentativeDate(facility, day) {
+  let requestedIndex = weekDays.indexOf(day);
+  let schedules = SPRING_BREAK_SCHEDULES[facility];
+  if (!schedules) return null;
+
+  for (let schedule of schedules) {
+    if (schedule.date) {
+      let d = new Date(schedule.date + "T00:00:00");
+      if (getWeekIndex(d) === requestedIndex) {
+        return d;
+      }
+    } else if (schedule.startDate && schedule.endDate) {
+      let s = new Date(schedule.startDate + "T00:00:00");
+      let e = new Date(schedule.endDate + "T23:59:59");
+      let startWeek = getWeekIndex(s);
+      let endWeek = getWeekIndex(e);
+      if (requestedIndex >= startWeek && requestedIndex <= endWeek) {
+        let offset = requestedIndex - startWeek;
+        return new Date(s.getTime() + offset * 86400000);
+      }
+    }
+  }
+  return null;
+}
+
+// 计算代表性日期标签，基于 SPRING_BREAK_SCHEDULES 配置（以 "west" 为参考）
+function getRepresentativeLabels() {
+  const labels = [];
+  // 对于 Monday～Sunday（下标 0～6）
+  for (let i = 0; i < weekDays.length; i++) {
+    let day = weekDays[i];
+    let repDate = getRepresentativeDate("west", day);
+    if (repDate) {
+      let m = (repDate.getMonth() + 1).toString().padStart(2, '0');
+      let d = repDate.getDate().toString().padStart(2, '0');
+      labels.push(`${m}-${d} ${day}`);
+    } else {
+      labels.push(day);
+    }
+  }
+  return labels;
+}
+
+// 定义春假图表专用的固定横轴时间刻度（按升序排列）
+const springFixedTimes = ["06:00", "07:00", "09:00", "10:00", "12:00", "14:00", "16:30", "17:00", "18:00", "19:00", "20:00"];
+
+// ──────────────────────────────────────────────
+// 新增辅助函数：针对春/秋假，根据日期返回营业时段
+function getSpringHoursForDate(facility, dateObj) {
+  const schedules = SPRING_BREAK_SCHEDULES[facility];
+  if (!schedules) return null;
+  const yyyy = dateObj.getFullYear();
+  const mm = (dateObj.getMonth() + 1).toString().padStart(2, "0");
+  const dd = dateObj.getDate().toString().padStart(2, "0");
+  const dateStr = `${yyyy}-${mm}-${dd}`;
+  for (let schedule of schedules) {
+    if (schedule.date) {
+      if (schedule.date === dateStr) {
+        if (schedule.closed) return null;
+        return [parseTimeToHour(schedule.start), parseTimeToHour(schedule.end)];
+      }
+    } else if (schedule.startDate && schedule.endDate) {
+      if (dateStr >= schedule.startDate && dateStr <= schedule.endDate) {
+        if (schedule.closed) return null;
+        return [parseTimeToHour(schedule.start), parseTimeToHour(schedule.end)];
+      }
+    }
+  }
+  return null;
+}
+
+// 新增辅助函数：提取指定设施所有春/秋假日期（以“west”为参考）
+function getAllSpringDates(facility) {
+  const schedules = SPRING_BREAK_SCHEDULES[facility];
+  let dateSet = new Set();
+  for (let schedule of schedules) {
+    if (schedule.date) {
+      dateSet.add(schedule.date);
+    } else if (schedule.startDate && schedule.endDate) {
+      let start = new Date(schedule.startDate + "T00:00:00");
+      let end = new Date(schedule.endDate + "T00:00:00");
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const yyyy = d.getFullYear();
+        const mm = (d.getMonth() + 1).toString().padStart(2, "0");
+        const dd = d.getDate().toString().padStart(2, "0");
+        dateSet.add(`${yyyy}-${mm}-${dd}`);
+      }
+    }
+  }
+  // 转换为数组并排序（按日期升序）
+  let dates = Array.from(dateSet).sort();
+  // 构造标签：格式 "MM-DD Weekday"
+  return dates.map(dstr => {
+    let d = new Date(dstr + "T00:00:00");
+    let m = (d.getMonth() + 1).toString().padStart(2, "0");
+    let dd = d.getDate().toString().padStart(2, "0");
+    // 使用 getWeekIndex 函数转换为 Monday～Sunday 的索引，再映射到 weekDays 数组
+    let dayName = weekDays[getWeekIndex(d)];
+    return { dateStr: dstr, label: `${m}-${dd} ${dayName}`, dateObj: new Date(d) };
+  });
+}
+
+// ──────────────────────────────────────────────
+// 修改后的春/秋假营业时间图表渲染（弹出窗口内）
+function renderSpringChart() {
+  let chartDom = document.getElementById("spring-chart");
+  let myChart = echarts.init(chartDom);
+
+  // 自动从 SPRING_BREAK_SCHEDULES（以 "west" 为参考）中提取所有日期
+  let dateItems = getAllSpringDates("west");
+  // 构造纵轴标签，格式 "MM-DD Weekday"
+  let yLabels = dateItems.map(item => item.label);
+
+  // 定义各设施对应的颜色及微调 offset（使同一天内三条线分离）
+  const facilities = [
+    { name: "West", key: "west", color: "#F2A2A2", offset: -0.2 },
+    { name: "East", key: "east", color: "#C5AAFF", offset: 0 },
+    { name: "Circle", key: "circle", color: "#B5E8BC", offset: 0.2 }
+  ];
+
+  // 构造系列数据：遍历所有日期，使用 getSpringHoursForDate 自动解析营业时段
+  let series = facilities.map(fac => {
+    let data = dateItems.map((item, index) => {
+      let hrs = getSpringHoursForDate(fac.key, item.dateObj);
+      return hrs ? [index + fac.offset, hrs[0], hrs[1]] : null;
+    }).filter(d => d !== null);
+    return {
+      name: fac.name,
+      type: "custom",
+      renderItem: function (params, api) {
+        let yPos = api.value(0);
+        let start = api.coord([api.value(1), yPos]);
+        let end = api.coord([api.value(2), yPos]);
+        return {
+          type: "line",
+          shape: { x1: start[0], y1: start[1], x2: end[0], y2: end[1] },
+          style: { stroke: fac.color, lineWidth: 6 } // 线宽可在此调整
+        };
+      },
+      encode: { x: [1, 2], y: 0 },
+      data: data
+    };
+  });
+
+  // 固定横轴时间标签
+  const springFixedTimes = ["06:00", "07:00", "09:00", "10:00", "12:00", "14:00", "16:30", "17:00", "18:00", "19:00", "20:00"];
+
+  let option = {
+    tooltip: { trigger: "item" },
+    grid: { left: '15%', right: '10%', top: '10%', bottom: '10%' },
+    xAxis: {
+      type: "value",
+      min: 6,
+      max: 20,
+      interval: 1,
+      axisLine: { show: false },
+      axisLabel: {
+        formatter: function(value) {
+          let h = Math.floor(value);
+          let m = Math.round((value - h) * 60);
+          let label = (h < 10 ? "0" + h : h) + ":" + (m === 0 ? "00" : (m < 10 ? "0" + m : m));
+          return springFixedTimes.includes(label) ? label : "";
+        }
+      }
+    },
+    yAxis: {
+      type: "value",
+      min: -0.5,
+      max: yLabels.length - 0.5,
+      splitNumber: yLabels.length,
+      axisLabel: {
+        formatter: function(value) {
+          if (Math.abs(value - Math.round(value)) < 0.001) {
+            return yLabels[Math.round(value)] || "";
+          }
+          return "";
+        }
+      },
+      splitLine: { show: false },
+      axisTick: { show: true }
+    },
+    legend: { data: facilities.map(f => f.name) },
+    color: facilities.map(f => f.color),
+    series: series
+  };
+
+  myChart.setOption(option);
+}
+
+
 /* =====================
    以下为烟花动画效果代码
    （原代码中，每隔100ms添加一个烟花，并通过 requestAnimationFrame 进行动画更新）
