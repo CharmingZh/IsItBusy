@@ -479,7 +479,8 @@ function renderChart(xAxis, wData, eData, cData) {
   let myChart = echarts.init(chartDom);
   const now = formatTime(new Date());
   if (!xAxis.includes(now)) xAxis.push(now);
-  const showTimes = ['06:00','09:00','12:00','15:00','18:00','21:00','22:00','23:00'];
+  const showTimes = ['06:00','09:00','12:00','15:00','18:00','21:00', '22:00', '23:00'];
+  // const showTimes = [];
   let option = {
     tooltip: { trigger: 'axis' },
     legend: { data: ['West', 'East', 'Circle'] },
@@ -487,7 +488,7 @@ function renderChart(xAxis, wData, eData, cData) {
       type: 'category',
       data: xAxis,
       axisLabel: {
-        interval: 3,
+        // interval: 1,
         rotate: 45,
         formatter: function(value) { return showTimes.includes(value) ? value : ''; }
       }
@@ -644,17 +645,3 @@ function initFireworks() {
   }
 })();
 
-// 系统启动时间：2025-02-20 22:47:07
-const systemStartTime = new Date("2025-02-20T22:47:07");
-
-function updateRuntime() {
-  const now = new Date();
-  const diff = now - systemStartTime;
-  const seconds = Math.floor(diff / 1000) % 60;
-  const minutes = Math.floor(diff / (1000 * 60)) % 60;
-  const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s; `;
-}
-updateRuntime();
-setInterval(updateRuntime, 1000);

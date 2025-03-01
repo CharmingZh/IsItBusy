@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!--    访客统计-->
+  <!--    访客统计-->
   <script src="https://cdn.counter.dev/script.js" data-id="b302df63-7c13-496d-b28c-b3b9bc46806c" data-utcoffset="-5"></script>
   <link href="https://fonts.googleapis.com/css2?family=Doto:wght@600&display=swap" rel="stylesheet">
   <meta charset="utf-8" />
 
-    <!-- 添加 viewport-fit=cover 以支持全屏安全区域 -->
+  <!-- 添加 viewport-fit=cover 以支持全屏安全区域 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
   <!-- 默认标题（非节日状态下） -->
@@ -22,54 +22,72 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
 </head>
 <body>
-  <!-- 新增：全屏烟花 canvas（放在最前面，但在样式中设置 z-index 为 0）  -->
-  <canvas id="fireworksCanvas"></canvas>
+<!-- 新增：全屏烟花 canvas（放在最前面，但在样式中设置 z-index 为 0）  -->
+<canvas id="fireworksCanvas"></canvas>
 
-  <!-- 原有主要内容，设置为相对定位并半透明背景以便烟花透过 -->
-  <div class="main-container">
-    <!-- 顶部区域 -->
-    <header>
-      <!-- 原有标题（节日效果会在 JS 中自动替换） -->
-      <h2>MSU 健身房人浪预报🌊</h2>
-      <div id="realtime-container">
-        <div class="realtime-box-west" id="realtime-west">
-          <span class="realtime-label">West</span>
-          <span class="realtime-count">--</span>
-        </div>
-        <div class="realtime-box-circle" id="realtime-circle">
-          <span class="realtime-label">Circle</span>
-          <span class="realtime-count">--</span>
-        </div>
-        <div class="realtime-box-east" id="realtime-east">
-          <span class="realtime-label">East</span>
-          <span class="realtime-count">--</span>
-        </div>
+<!-- 原有主要内容，设置为相对定位并半透明背景以便烟花透过 -->
+<div class="main-container">
+  <!-- 顶部区域 -->
+  <header>
+    <!-- 原有标题（节日效果会在 JS 中自动替换） -->
+    <h2>MSU 健身房人浪预报🌊</h2>
+    <div id="realtime-container">
+      <div class="realtime-box-west" id="realtime-west">
+        <span class="realtime-label">West</span>
+        <span class="realtime-count">--</span>
       </div>
-<!--      &lt;!&ndash; 保持原有 onclick 不变 &ndash;&gt;-->
-<!--      <button id="about-button" onclick="window.open('about.html', '_blank')">≡</button>-->
-    </header>
-
-    <!-- 中间内容区域 -->
-    <div class="content">
-      <div id="chart"></div>
+      <div class="realtime-box-circle" id="realtime-circle">
+        <span class="realtime-label">Circle</span>
+        <span class="realtime-count">--</span>
+      </div>
+      <div class="realtime-box-east" id="realtime-east">
+        <span class="realtime-label">East</span>
+        <span class="realtime-count">--</span>
+      </div>
     </div>
+    <!--      &lt;!&ndash; 保持原有 onclick 不变 &ndash;&gt;-->
+    <!--      <button id="about-button" onclick="window.open('about.html', '_blank')">≡</button>-->
+  </header>
 
-    <!-- 底部说明区域 -->
-    <footer>
-<!--      <canvas id="fireworksCanvas"></canvas>-->
-      <!-- 新增：系统运行时长 -->
-      <p id="system-runtime">Running for: --</p>
-      <div id="data-refresh-info" class="data-info">
-          （Last update: <span id="last-update">--:--</span>）
-      </div>
-
-      <p class="disclaimer">Predictions may vary. Refer to actual data.</p>
-      <p>Thanks to MSU for the <a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">data</a>❤. This project is for personal study and planning only.</p>
-      <p><b>Contact📧: zhan2374 [at] msu [dot] edu</b></p>
-    </footer>
+  <!-- 中间内容区域 -->
+  <div class="content">
+    <div id="chart"></div>
   </div>
 
-  <!-- 引入业务逻辑及烟花动画的 JS（合并所有 JS 逻辑到 main.js 中） -->
-  <script src="main.js"></script>
+  <!-- 底部说明区域 -->
+  <footer>
+    <!--      <canvas id="fireworksCanvas"></canvas>-->
+    <!-- 新增：系统运行时长 -->
+    <p id="system-runtime">Running for: --</p>
+    <div id="data-refresh-info" class="data-info">
+      （Last update: <span id="last-update">--:--</span>）
+    </div>
+
+    <script>
+
+      // 系统启动时间：2025-02-20 22:47:07
+      const systemStartTime = new Date("2025-02-20T22:47:07");
+
+      function updateRuntime() {
+        const now = new Date();
+        const diff = now - systemStartTime;
+        const seconds = Math.floor(diff / 1000) % 60;
+        const minutes = Math.floor(diff / (1000 * 60)) % 60;
+        const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s; `;
+      }
+      updateRuntime();
+      setInterval(updateRuntime, 1000);
+    </script>
+
+    <p class="disclaimer">Predictions may vary. Refer to actual data.</p>
+    <p>Thanks to MSU for the <a href="https://apps.recsports.msu.edu/volume/hourly.php" target="_blank">data</a>❤. This project is for personal study and planning only.</p>
+    <p><b>Contact📧: zhan2374 [at] msu [dot] edu</b></p>
+  </footer>
+</div>
+
+<!-- 引入业务逻辑及烟花动画的 JS（合并所有 JS 逻辑到 main.js 中） -->
+<script src="main.js"></script>
 </body>
 </html>
