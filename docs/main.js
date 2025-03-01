@@ -2,6 +2,135 @@
  * main.js
  * 集成营业时间可视化 + 原有功能优化
  *********************************************/
+// 调试变量：
+// 取消下面一行的注释，即可在调试时使用指定时间
+// let debugTime = new Date("2025-03-02T18:00:00");
+
+// 辅助函数：返回当前时间，如果 debugTime 不为 null，则返回 debugTime，否则返回真实当前时间
+function getCurrentTime() {
+  return debugTime || new Date();
+}
+/*********************************************
+ * 全局可修改配置变量
+ *********************************************/
+// 春假特殊营业时间配置（仅适用于春假期间的特殊日期）
+// 日期格式为 YYYY-MM-DD 或区间（startDate ～ endDate），时间格式 "HH:mm"（24小时制）
+// 注意：各设施日期区间可能不连续
+const SPRING_BREAK_SCHEDULES = {
+  // IM West
+  "west": [
+    { date: "2025-02-28", start: "06:00:00", end: "18:00:00" },
+    { startDate: "2025-03-01", endDate: "2025-03-02", start: "11:59:00", end: "18:00:00" },
+    { startDate: "2025-03-03", endDate: "2025-03-07", start: "09:00:00", end: "19:00:00" },
+    { startDate: "2025-03-08", endDate: "2025-03-09", start: "11:59:00", end: "20:00:00" }
+  ],
+  // IM East
+  "east": [
+    { date: "2025-02-28", start: "06:00:00", end: "18:00:00" },
+    { startDate: "2025-03-01", endDate: "2025-03-02", closed: true },
+    { startDate: "2025-03-03", endDate: "2025-03-07", start: "10:00:00", end: "14:00:00" },
+    { startDate: "2025-03-08", endDate: "2025-03-09", start: "11:59:00", end: "20:00:00" }
+  ],
+  // IM Circle
+  "circle": [
+    { date: "2025-02-28", start: "07:00", end: "17:00:00" },
+    { startDate: "2025-03-01", endDate: "2025-03-02", start: "11:00:00", end: "19:00:00" },
+    { startDate: "2025-03-03", endDate: "2025-03-07", start: "08:00:00", end: "16:30:00" },
+    { startDate: "2025-03-08", endDate: "2025-03-09", start: "11:00:00", end: "19:00:00" }
+  ]
+};
+
+// 管理员特殊管理日期（格式：YYYY-MM-DD），在这些日期下可强制开门或关闭，
+// 可选配置：forceOpen（布尔值，全天强制开/关），
+// 或 forceOpenTime（指定时间区间，格式为 { start: "HH:mm", end: "HH:mm" }，在该时段内采用 forceOpen 设置）
+const ADMIN_MANAGEMENT_DATES = {
+  // "2025-04-01": { forceOpen: true, forceOpenTime: { start: "08:00", end: "20:00" } },
+  // "2025-04-02": { forceOpen: false }
+};
+
+/*********************************************
+ * 以下为辅助函数：春假和管理员特殊管理判断
+ *********************************************/
+
+/**
+ * 判断当前日期是否落在指定日期（YYYY-MM-DD）内
+ */
+function isSameDate(dateObj, dateStr) {
+  const [yyyy, mm, dd] = dateStr.split("-").map(Number);
+  return dateObj.getFullYear() === yyyy &&
+      (dateObj.getMonth() + 1) === mm &&
+      dateObj.getDate() === dd;
+}
+
+/**
+ * 根据 SPRING_BREAK_SCHEDULES 配置，判断指定设施在 dateObj 是否有特殊营业设置。
+ * 若命中，则返回布尔值表示是否开门；若未命中则返回 null
+ */
+function getSpringBreakScheduleOpen(facility, dateObj) {
+  const schedules = SPRING_BREAK_SCHEDULES[facility];
+  if (!schedules) return null;
+  // 将当前日期格式化为 YYYY-MM-DD
+  const yyyy = dateObj.getFullYear();
+  const mm = (dateObj.getMonth() + 1).toString().padStart(2, "0");
+  const dd = dateObj.getDate().toString().padStart(2, "0");
+  const dateStr = `${yyyy}-${mm}-${dd}`;
+
+  for (let schedule of schedules) {
+    // 若配置中有 date 属性，直接比较
+    if (schedule.date && schedule.date === dateStr) {
+      if (schedule.closed) return false;
+      // 检查当前时间是否在 [start, end)
+      return isWithinTime(dateObj, schedule.start, schedule.end);
+    }
+    // 如果配置中有 startDate 与 endDate，则判断是否落在区间内
+    if (schedule.startDate && schedule.endDate) {
+      const start = new Date(schedule.startDate + "T00:00:00");
+      const end = new Date(schedule.endDate + "T23:59:59");
+      if (dateObj >= start && dateObj <= end) {
+        if (schedule.closed) return false;
+        return isWithinTime(dateObj, schedule.start, schedule.end);
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * 判断 dateObj 当前时间是否在指定的时间区间内
+ * 参数 timeStr 格式 "HH:mm"
+ */
+function isWithinTime(dateObj, startStr, endStr) {
+  const [startHour, startMin] = startStr.split(":").map(Number);
+  const [endHour, endMin] = endStr.split(":").map(Number);
+  const currentMinutes = dateObj.getHours() * 60 + dateObj.getMinutes();
+  const startMinutes = startHour * 60 + startMin;
+  const endMinutes = endHour * 60 + endMin;
+  return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+}
+
+/**
+ * 获取管理员特殊管理配置，返回对应配置对象，
+ * 格式如 { forceOpen: true, forceOpenTime: { start: "08:00", end: "20:00" } } 或 { forceOpen: false }
+ * 如果不在名单中，返回 null
+ */
+function getAdminManagement(dateObj) {
+  const yyyy = dateObj.getFullYear();
+  const mm = (dateObj.getMonth() + 1).toString().padStart(2, "0");
+  const dd = dateObj.getDate().toString().padStart(2, "0");
+  const dateStr = `${yyyy}-${mm}-${dd}`;
+  return ADMIN_MANAGEMENT_DATES[dateStr] || null;
+}
+
+/**
+ * 判断 dateObj 当前时间是否在管理员配置的 forceOpenTime 内
+ */
+function isWithinAdminTime(dateObj, forceOpenTime) {
+  return isWithinTime(dateObj, forceOpenTime.start, forceOpenTime.end);
+}
+
+/*********************************************
+ * 以下为原有代码部分
+ *********************************************/
 
 // =====================
 // 节日日期判断：如果今天是每年2月26，则替换 <title> 与 <header> 中的 <h2>
@@ -74,12 +203,58 @@ function sgSmooth(arr, kernel) {
 }
 
 /**
- * 判断 IM West/East 是否在给定时间营业
- *  - Mon-Fri: 6am - 11pm
- *  - Saturday: 10am - 9pm
- *  - Sunday: 10am - 10pm
+ * 判断 IM West 在给定时间营业
+ * 正常学期营业时间：
+ *  - 周日: 10am - 10pm
+ *  - 周六: 10am - 9pm
+ *  - 周一至周五: 6am - 11pm
+ * 优先：春假特殊营业时间 → 管理员特殊管理 → 正常学期营业时间
  */
-function isOpenWestEast(dateObj) {
+function isOpenWest(dateObj) {
+  // 先检测春假特殊营业时间
+  const springStatus = getSpringBreakScheduleOpen("west", dateObj);
+  if (springStatus !== null) return springStatus;
+
+  // 管理员特殊管理配置
+  const adminConfig = getAdminManagement(dateObj);
+  if (adminConfig) {
+    if (adminConfig.forceOpenTime) {
+      if (isWithinAdminTime(dateObj, adminConfig.forceOpenTime)) {
+        return adminConfig.forceOpen;
+      }
+    } else if (typeof adminConfig.forceOpen === 'boolean') {
+      return adminConfig.forceOpen;
+    }
+  }
+
+  // 正常学期营业时间
+  const day = dateObj.getDay();
+  const hour = dateObj.getHours();
+  if (day === 0) return hour >= 10 && hour < 22;
+  if (day === 6) return hour >= 10 && hour < 21;
+  return hour >= 6 && hour < 23;
+}
+
+/**
+ * 判断 IM East 在给定时间营业
+ * 与 IM West 正常营业时间相同，但春假特殊营业时间不同
+ * 优先：春假特殊营业时间 → 管理员特殊管理 → 正常学期营业时间
+ */
+function isOpenEast(dateObj) {
+  const springStatus = getSpringBreakScheduleOpen("east", dateObj);
+  if (springStatus !== null) return springStatus;
+
+  const adminConfig = getAdminManagement(dateObj);
+  if (adminConfig) {
+    if (adminConfig.forceOpenTime) {
+      if (isWithinAdminTime(dateObj, adminConfig.forceOpenTime)) {
+        return adminConfig.forceOpen;
+      }
+    } else if (typeof adminConfig.forceOpen === 'boolean') {
+      return adminConfig.forceOpen;
+    }
+  }
+
   const day = dateObj.getDay();
   const hour = dateObj.getHours();
   if (day === 0) return hour >= 10 && hour < 22;
@@ -89,11 +264,27 @@ function isOpenWestEast(dateObj) {
 
 /**
  * 判断 IM Circle 是否在给定时间营业
- *  - Monday-Thursday: 7:00 - 10pm（设备区 9:30 才开）
- *  - Friday:          7:00 - 8pm（设备区 9:30 才开）
- *  - Sat & Sun:       12pm - 5pm
+ * 正常学期营业时间：
+ *  - 周一至周四: 7:00 - 10pm（设备区 9:30 才开）
+ *  - 周五: 7:00 - 8pm（设备区 9:30 才开）
+ *  - 周六、周日: 12pm - 5pm
+ * 优先：春假特殊营业时间 → 管理员特殊管理 → 正常学期营业时间
  */
 function isOpenCircle(dateObj) {
+  const springStatus = getSpringBreakScheduleOpen("circle", dateObj);
+  if (springStatus !== null) return springStatus;
+
+  const adminConfig = getAdminManagement(dateObj);
+  if (adminConfig) {
+    if (adminConfig.forceOpenTime) {
+      if (isWithinAdminTime(dateObj, adminConfig.forceOpenTime)) {
+        return adminConfig.forceOpen;
+      }
+    } else if (typeof adminConfig.forceOpen === 'boolean') {
+      return adminConfig.forceOpen;
+    }
+  }
+
   const day = dateObj.getDay();
   const hour = dateObj.getHours();
   if (day >= 1 && day <= 4) {
@@ -214,7 +405,7 @@ function processCSV(csvText) {
 
   for (let i = 0; i < timeData.length; i++) {
     let t = timeData[i];
-    if (!isOpenWestEast(t)) { westOcc[i] = null; eastOcc[i] = null; }
+    if (!isOpenWest(t)) { westOcc[i] = null; eastOcc[i] = null; }
     if (!isOpenCircle(t)) { circleOcc[i] = null; }
   }
   const sgKernel = [-2, 3, 6, 7, 6, 3, -2].map(x => x / 21);
@@ -249,18 +440,24 @@ function updateRealtimeDisplay() {
   function updateElement(id, value, diff) {
     let container = document.getElementById(id);
     if (!container) return;
-    let isOpen = id.includes('west') || id.includes('east')
-      ? isOpenWestEast(currentTime)
-      : isOpenCircle(currentTime);
+    // 根据 id 判断采用不同的营业时间判断函数
+    let isOpen;
+    if (id.includes('west')) {
+      isOpen = isOpenWest(currentTime);
+    } else if (id.includes('east')) {
+      isOpen = isOpenEast(currentTime);
+    } else {
+      isOpen = isOpenCircle(currentTime);
+    }
     let labelColor = isOpen ? "#00ffc4" : "#767676";
     container.style.boxShadow = isOpen ? "" : "none";
     let badgeHTML = isOpen
-      ? `<span class="realtime-status-badge realtime-open">OPEN</span>`
-      : `<span class="realtime-status-badge realtime-closed">CLOSED</span>`;
+        ? `<span class="realtime-status-badge realtime-open">OPEN</span>`
+        : `<span class="realtime-status-badge realtime-closed">CLOSED</span>`;
     let displayHTML = isOpen
-      ? `<span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}${badgeHTML}</span><br>
+        ? `<span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}${badgeHTML}</span><br>
          <span class="realtime-count">${value || 0}${diff > 0 ? `<span class="realtime-indicator-up">▲${diff}</span>` : diff < 0 ? `<span class="realtime-indicator-down">▼${Math.abs(diff)}</span>` : `<span class="realtime-indicator-none">┉</span>`}</span>`
-      : `<span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}</span><br>
+        : `<span class="realtime-label" style="color:${labelColor}">${id.split('-')[1]}</span><br>
          <span class="realtime-count closed_word">CLOSED</span>`;
     container.innerHTML = displayHTML;
   }
@@ -290,6 +487,7 @@ function renderChart(xAxis, wData, eData, cData) {
       type: 'category',
       data: xAxis,
       axisLabel: {
+        interval: 3,
         rotate: 45,
         formatter: function(value) { return showTimes.includes(value) ? value : ''; }
       }
@@ -411,16 +609,11 @@ class Particle {
 // 动画函数
 function animateFireworks() {
   // 使用半透明背景覆盖整个画布，实现拖影效果
-// 保存当前的复合操作
-const prevComposite = ctx.globalCompositeOperation;
-// 使用 'destination-out' 模式，在目标像素中减去alpha值
-ctx.globalCompositeOperation = 'destination-out';
-// 使用较低的不透明度来擦除旧的图像
-ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-// 恢复原先的复合操作
-ctx.globalCompositeOperation = prevComposite;
-
+  const prevComposite = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.globalCompositeOperation = prevComposite;
 
   fireworks.forEach((firework, index) => {
     firework.update();
@@ -440,7 +633,7 @@ function initFireworks() {
   animateFireworks();
 }
 (function() {
-  const now = new Date();
+  const now = getCurrentTime()
   if (now.getMonth() === 1 && now.getDate() === 26) {
     // 只有在2月26日才启动烟花效果
     initFireworks();
@@ -450,8 +643,6 @@ function initFireworks() {
     if (canvas) canvas.style.display = 'none';
   }
 })();
-
-
 
 // 系统启动时间：2025-02-20 22:47:07
 const systemStartTime = new Date("2025-02-20T22:47:07");
