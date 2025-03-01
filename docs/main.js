@@ -597,7 +597,7 @@ function getNormalHours(facility, day) {
 // 固定横轴显示的时间标签（格式为 "HH:MM"），按升序排列
 const fixedTimes = ["06:00", "10:00", "12:00", "17:00", "20:00", "21:00", "22:00", "23:00"];
 
-const normalDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const normalDays = ["Sun", "Mon", "Tues", "Wed", "Thur", "Fri", "Sat"];
 
 
 // ──────────────────────────────────────────────
@@ -641,7 +641,8 @@ function renderNormalChart() {
 
   let option = {
     tooltip: { trigger: "item" },
-    grid: { left: '15%', right: '10%', top: '10%', bottom: '10%' },
+    grid: { containLabel: true, // 避免文字被遮挡
+      left: '5%', right: '5%', top: '5%', bottom: '1%' },
     xAxis: {
       type: "value",
       min: 6,
@@ -649,6 +650,7 @@ function renderNormalChart() {
       axisLine: { show: false },
       interval: 1,
       axisLabel: {
+        rotate: 45,
         formatter: function(value) {
           let h = Math.floor(value);
           let m = Math.round((value - h) * 60);
@@ -696,7 +698,7 @@ function parseTimeToHour(timeStr) {
 }
 
 // 定义星期数组，采用 Monday=0,...,Sunday=6
-const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+const weekDays = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
 
 // 计算一个 Date 对象对应的“工作制”星期索引：使 Monday 为 0, …, Sunday 为 6
 function getWeekIndex(dateObj) {
@@ -894,7 +896,9 @@ function renderSpringChart() {
 
   let option = {
     tooltip: { trigger: "item" },
-    grid: { left: '15%', right: '10%', top: '10%', bottom: '10%' },
+    grid: {
+      containLabel: true, // 避免文字被遮挡
+      left: '5%', right: '5%', top: '5%', bottom: '1%' },
     xAxis: {
       type: "value",
       min: 6,
@@ -902,6 +906,7 @@ function renderSpringChart() {
       interval: 1,
       axisLine: { show: false },
       axisLabel: {
+        rotate: 45,
         formatter: function(value) {
           let h = Math.floor(value);
           let m = Math.round((value - h) * 60);

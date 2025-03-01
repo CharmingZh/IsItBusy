@@ -269,6 +269,36 @@ footer {
     margin: 0.1dvh;
   }
 
+  /* 弹窗采用上下左右各留一定间距 */
+  #hours-popup {
+    position: fixed;
+    display: block;
+    width: 90vw !important;     /* 占据屏幕90%宽度 */
+    height: 80vh !important;    /* 占据屏幕80%高度 */
+    top: 50%;
+    /*left: 50%;*/
+    transform: translate(-50%, -50%);
+    /*padding: 5px;*/
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  /* 示例：将 100dvh 改为 100vh */
+  #hours-popup .chart-container {
+    width: 100%;
+    height: calc(100% - 50px); /* 根据头部区域高度调整，如留50px给头部 */
+    box-sizing: border-box;
+  }
+
+  /* 图表容器内 echart 的尺寸自适应 */
+  #spring-chart,
+  #normal-chart {
+    width: 100% !important;
+    height: 80%;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
 }
 
 
@@ -323,6 +353,36 @@ footer {
   }
   p {
     margin: 0.1dvh;
+  }
+
+  /* 弹窗采用上下左右各留一定间距 */
+  #hours-popup {
+    position: fixed;
+    display: block;
+    width: 90vw !important;     /* 占据屏幕90%宽度 */
+    height: 80vh !important;    /* 占据屏幕80%高度 */
+    top: 50%;
+    /*left: 50%;*/
+    transform: translate(-50%, -50%);
+    /*padding: 5px;*/
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  /* 示例：将 100dvh 改为 100vh */
+  #hours-popup .chart-container {
+    width: 100%;
+    height: calc(100% - 50px); /* 根据头部区域高度调整，如留50px给头部 */
+    box-sizing: border-box;
+  }
+
+  /* 图表容器内 echart 的尺寸自适应 */
+  #spring-chart,
+  #normal-chart {
+    width: 100% !important;
+    height: 80%;
+    margin: 0;
+    box-sizing: border-box;
   }
 }
 
@@ -521,8 +581,8 @@ footer {
 #hours-popup {
   display: none;
   position: fixed;
-  width: 52dvh;
-  height: 40dvh;
+  width: 70dvh;
+  height: 70dvh;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -538,10 +598,10 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
+  font-size: 2dvh;
   font-weight: bold;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
+  border-bottom: 0.5px solid #ddd;
+  padding-bottom: 1px;
   margin-bottom: 10px;
 }
 
