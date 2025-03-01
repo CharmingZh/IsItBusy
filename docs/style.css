@@ -359,8 +359,8 @@ footer {
   #hours-popup {
     position: fixed;
     display: block;
-    width: 90vw !important;     /* 占据屏幕90%宽度 */
-    height: 80vh !important;    /* 占据屏幕80%高度 */
+    width: 50dvh !important;     /* 占据屏幕90%宽度 */
+    height: 80dvh !important;    /* 占据屏幕80%高度 */
     top: 50%;
     /*left: 50%;*/
     transform: translate(-50%, -50%);
