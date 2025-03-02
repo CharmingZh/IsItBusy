@@ -115,6 +115,7 @@ Considering the continuity and symmetry of the normal distribution, our estimati
 - [x] Data storage separation, preventing GitHub Action overload!
 - [x] Opening and closing hours visualization 🈺
 - [x] Improved interval segmentation 🎉 (2025-02-24)
+- [x] QJHBD 🎂 (2025-02-26)
 - [x] Multi-device responsive layout for an optimal user experience
 - [x] Spring/Fall holiday and normal hours pop-up visualization ✅ (2025-03-01)
 - [ ] More improvements...
