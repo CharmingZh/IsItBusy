@@ -1,8 +1,8 @@
 # 🏋️‍♂️ MSU Sweat Scheduler 🌊
 
 <div style="display: flex; justify-content: space-between; align-items: center;">
-   <img src="docs/output_images/09_integration_by_year_2025.png" alt="Image 1" style="width: 74%; margin-right: 0%;"> 
-   <img src="docs/pic/demo.png" alt="Image 2" style="width: 22.5%; margin-right: 0%;">
+   <img src="docs/output_images/09_integration_by_year_2025.png" alt="Image 1" style="width: 73%; margin-right: 0%;"> 
+   <img src="docs/pic/demo.png" alt="Image 2" style="width: 22%; margin-right: 0%;">
 </div>
 
 <center>Visualization of 2025 Data and Runtime Demo.</center>
