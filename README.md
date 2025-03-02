@@ -1,8 +1,8 @@
 # 🏋️‍♂️ MSU 健身房人浪预报 🌊
 
 <div style="display: flex; justify-content: space-between; align-items: center;">
-   <img src="docs/output_images/09_integration_by_year_2025.png" alt="图片2" style="width: 74%; margin-right: 0%;"> 
- <img src="docs/pic/demo.png" alt="图片2" style="width: 22.5%; margin-right: 0%;">
+   <img src="docs/output_images/09_integration_by_year_2025.png" alt="图片2" style="width: 73%; margin-right: 0%;"> 
+ <img src="docs/pic/demo.png" alt="图片2" style="width: 22%; margin-right: 0%;">
 </div>
 <center>Viz of 2025 Data and Runtime Demo.</center>
 
