@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
     <!-- 默认标题（非节日状态下） -->
-    <title>MSU Sweat Scheduler 健身房人浪预报🌊</title>
+    <title>MSU 健身房人浪预报🌊 Sweat Scheduler </title>
 
     <!-- 引入液晶风格字体 VT323 -->
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
@@ -49,8 +49,7 @@
             <span class="realtime-count">--</span>
           </div>
         </div>
-        <!--      &lt;!&ndash; 保持原有 onclick 不变 &ndash;&gt;-->
-              <button id="about-button" onclick="window.open('about.html', '_blank')">≡</button>
+        <button id="about-button" onclick="window.open('about.html', '_blank')">About</button>
       </header>
 
       <!-- 中间内容区域 -->
@@ -65,11 +64,11 @@
               integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
               crossorigin="anonymous">
 
-        <div style="display: inline-block; padding: 5px 10px; background: #fff; margin-bottom: 1px; border-radius: 8px;">
+        <div style="display: inline-block; padding: 5px 10px; background: rgba(237,243,187,0.4); margin-bottom: 1px; border-radius: 8px;">
           <!-- 系统运行时长 -->
           <p id="system-runtime" style="margin: 0; font-weight: bold;">Running for: --</p>
           <!-- 数据刷新信息 -->
-          <p id="data-refresh-info" style="margin: 5px 0 10px; font-size: 12px;">（Last update: <span id="last-update">--:--</span>）</p>
+          <p id="data-refresh-info" style="margin: 5px 0 10px; font-size: 12px; color: #999999;">（Last update: <span id="last-update">--:--</span>）</p>
           <!-- Busuanzi 统计 -->
           <p style="margin: 0;">
             <i class="fas fa-globe" style="margin-right: 5px;"></i>
@@ -85,7 +84,6 @@
         <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
         <script>
-          // 系统启动时间：2025-02-20 22:47:07
           const systemStartTime = new Date("2025-02-20T22:47:07");
           function updateRuntime() {
             const now = new Date();
@@ -94,22 +92,19 @@
             const minutes = Math.floor(diff / (1000 * 60)) % 60;
             const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s;`;
+            document.getElementById("system-runtime").innerText = `Running for ${days}d ${hours}h ${minutes}m ${seconds}s`;
           }
           updateRuntime();
           setInterval(updateRuntime, 1000);
         </script>
       </footer>
-
-
     </div>
 
     <!-- 引入业务逻辑及烟花动画的 JS（合并所有 JS 逻辑到 main.js 中） -->
     <script src="main.js"></script>
 
-
     <!-- 营业时间按钮 -->
-    <button id="toggle-hours-btn">🈺业时间</button>
+    <button id="toggle-hours-btn">🈺</button>
 
     <!-- 营业时间弹窗 -->
     <div id="hours-popup" class="popup">
@@ -124,9 +119,6 @@
       <div id="spring-chart" class="chart-container"></div>
       <div id="normal-chart" class="chart-container" style="display: none;"></div>
     </div>
-
-
-
 
   </body>
 </html>

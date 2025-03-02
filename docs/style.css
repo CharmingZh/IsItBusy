@@ -143,21 +143,16 @@ header h2 {
   font-size: 2dvh;
 }
 
-
-
-
-
-
 /* ========== 关于 按钮 ========== */
 #about-button {
   position: absolute;
-  top: 0.3rem;
-  right: 0.5rem;
-  width: 30px;
-  height: 30px;
-  border-radius: 26%;
+  top: 0.3dvh;
+  right: 0.5dvh;
+  width: auto;
+  height: auto;
+  border-radius: 10px;
   background: rgba(150, 2, 38, 0.1);
-  border: 2px solid #960226;
+  border: 3px solid #960226;
   color: #970623;
   font-size: 1.2rem;
   line-height: 28px;
