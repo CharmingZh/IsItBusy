@@ -1,12 +1,27 @@
+# 🏋️‍♂️ MSU 健身房人浪预报 🌊
+
 <div style="display: flex; justify-content: space-between; align-items: center;">
    <img src="docs/output_images/09_integration_by_year_2025.png" alt="图片2" style="width: 74%; margin-right: 0%;"> 
- <img src="docs/pic/demo.png" alt="图片2" style="width: 21%; margin-right: 0%;">
+ <img src="docs/pic/demo.png" alt="图片2" style="width: 22.5%; margin-right: 0%;">
 </div>
 <center>Viz of 2025 Data and Runtime Demo.</center>
 
-本项目通过在服务端爬取 MSU 健身房实时人数数据（时间粒度五分钟，多了阿里云要炸），对当前人数进行了预测。人数衰减量我们默认个体的单次健身时长遵循正态分布。
-具体来说，我们通过参考了“美国成年人健身房训练时长统计分析”的数据，并对其拟合了概率密度函数( [参考](https://charmingzh.github.io/IsItBusy/about.html) )。
+本项目通过在服务器端爬取 MSU 健身房的实时人数增量数据（时间粒度五分钟，多了阿里云要炸），
+并基于这些数据对健身房内的实时人数进行预测。对于人数衰减量，我们假设个体的单次健身时长服从正态分布。
+具体来说，我们参考了“美国成年人健身房训练时长统计分析”的数据，并据此拟合了概率密度函数，以提高预测的准确性( [参考](https://charmingzh.github.io/IsItBusy/about.html) )。
 
+> **🌍 English Version: [README_EN.md](README_EN.md)**
+
+
+---
+## 📌 目录
+- [1. 如何使用](#1-如何使用)
+- [2. 美国成年人健身房训练时长统计分析](#2-美国成年人健身房训练时长统计分析)
+- [3. 全美国、全年龄段最受欢迎的健身时段](#3-全美国全年龄段最受欢迎的健身时段)
+- [4. MSU 健身房真实实时人数预报](#4-msu-健身房真实实时人数预报)
+- [☕ Buy Me a Coffee](#-buy-me-a-coffee)
+- [📚 References](#references)
+---
 # 1. 如何使用
 
 首先，使用浏览器打开（[🌧Sweat Scheduler | MSU 健身房人浪预报🌊](https://charmingzh.github.io/IsItBusy/)）小程序，然后按照如下步骤可以添加到桌面，方便随时访问。
@@ -95,14 +110,24 @@
 
 ## TODO List
 
-- [x] 实时数据爬取实现，并在阿里云服务器部署，数据联通成功；（2025-02-20 🎉可行性验证完成）
+- [x] 实时数据爬取功能已实现，并成功部署至阿里云服务器，数据传输与联通测试均正常运行；（2025-02-20 🎉 可行性验证完成）
 - [x] `index.html`, `about.html`页面！（2025-02-22 🎉第一版上线）
-- [x] 实现了数据仓分离，妈妈再也不用担心我的`Github Action`爆仓啦！（Github Action延迟与限额问题解决）；
+- [x] 成功实现数据仓库分离，妈妈再也不用担心我的`Github Action`爆仓啦！（Github Action延迟与限额问题解决）；
 - [x] 开馆闭馆时间，营业时间指示牌🈺；
 - [x] 中间加几个间隔的时间；（2025-02-24 🎉第二版上线）
 - [x] QJHBD；🎂
-- [x] Finished！
+- [x] 多尺寸窗口的自适应布局，确保在不同设备和屏幕分辨率下均能实现良好的可视化效果与用户体验；(目前仅针对：`iPhone 13/14`, `iPhone 16 Pro Max`, `iPad`用户进行了窗口优化。)
+- [x] 实现春秋假期及正常营业时间的弹出窗口可视化，提升用户体验与数据直观性；（2025-03-01 ✅）
+- [ ] ...
 
+## ☕ Buy Me a Coffee
+
+如果你觉得这个项目对你有帮助，可以请我喝杯咖啡支持一下！☕😊  
+Your support keeps this project going! ❤️
+
+<div style="text-align: center;">
+<img src="docs/pic/img.png" alt="微信收款码" style="width:50%;" />
+</div>
 
 ### References
 
