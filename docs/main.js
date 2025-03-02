@@ -624,6 +624,7 @@ function renderNormalChart() {
     return {
       name: fac.name,
       type: "custom",
+      tooltip: { show: false },  // 禁用单独的系列 tooltip
       renderItem: function (params, api) {
         let yPos = api.value(0);
         let start = api.coord([api.value(1), yPos]);
@@ -640,9 +641,31 @@ function renderNormalChart() {
   });
 
   let option = {
-    tooltip: { trigger: "item" },
-    grid: { containLabel: true, // 避免文字被遮挡
-      left: '5%', right: '5%', top: '5%', bottom: '1%' },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "line",
+        lineStyle: {
+          type: "dashed",
+          lineWidth: 5,    // 设置虚线的粗细
+          color: "#960226" // 设置虚线的颜色
+        }
+      },
+      formatter: function(params) {
+        // params 是一个数组，取第一个对象的 axisValue 显示当前时间
+        if (params && params.length > 0) {
+          let value = params[0].axisValue;
+          let h = Math.floor(value);
+          let m = Math.round((value - h) * 60);
+          return (h < 10 ? "0" + h : h) + ":" + (m === 0 ? "00" : (m < 10 ? "0" + m : m));
+        }
+        return "";
+      }
+    },
+    grid: {
+      containLabel: true, // 避免文字被遮挡
+      left: '5%', right: '5%', top: '5%', bottom: '1%'
+    },
     xAxis: {
       type: "value",
       min: 6,
@@ -655,6 +678,7 @@ function renderNormalChart() {
           let h = Math.floor(value);
           let m = Math.round((value - h) * 60);
           let label = (h < 10 ? "0" + h : h) + ":" + (m === 0 ? "00" : (m < 10 ? "0" + m : m));
+          // 固定时间标签，需确保 fixedTimes 在外部已定义（例如：["06:00", "07:00", "09:00", "10:00", ...]）
           return fixedTimes.includes(label) ? label : "";
         }
       }
@@ -684,6 +708,7 @@ function renderNormalChart() {
 }
 
 
+
 // ── 辅助函数 ─────────────────────────────
 
 // 将时间字符串转换为小时（小数）
@@ -698,7 +723,7 @@ function parseTimeToHour(timeStr) {
 }
 
 // 定义星期数组，采用 Monday=0,...,Sunday=6
-const weekDays = ["Mon", "Tues", "Wed", "Thur", "Fri", "Sat", "Sun"];
+const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 // 计算一个 Date 对象对应的“工作制”星期索引：使 Monday 为 0, …, Sunday 为 6
 function getWeekIndex(dateObj) {
@@ -782,7 +807,7 @@ function getRepresentativeLabels() {
     if (repDate) {
       let m = (repDate.getMonth() + 1).toString().padStart(2, '0');
       let d = repDate.getDate().toString().padStart(2, '0');
-      labels.push(`${m}-${d} ${day}`);
+      labels.push(`${day} ${m}-${d}`);
     } else {
       labels.push(day);
     }
@@ -851,6 +876,8 @@ function getAllSpringDates(facility) {
 
 // ──────────────────────────────────────────────
 // 修改后的春/秋假营业时间图表渲染（弹出窗口内）
+// ──────────────────────────────────────────────
+// 修改后的春/秋假营业时间图表渲染（弹出窗口内）
 function renderSpringChart() {
   let chartDom = document.getElementById("spring-chart");
   let myChart = echarts.init(chartDom);
@@ -876,6 +903,7 @@ function renderSpringChart() {
     return {
       name: fac.name,
       type: "custom",
+      tooltip: { show: false },  // 禁止单独显示该系列的 tooltip 信息
       renderItem: function (params, api) {
         let yPos = api.value(0);
         let start = api.coord([api.value(1), yPos]);
@@ -895,10 +923,31 @@ function renderSpringChart() {
   const springFixedTimes = ["06:00", "07:00", "09:00", "10:00", "12:00", "14:00", "16:30", "17:00", "18:00", "19:00", "20:00"];
 
   let option = {
-    tooltip: { trigger: "item" },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "line",
+        lineStyle: {
+          type: "dashed",
+          lineWidth: 5,    // 设置虚线的粗细
+          color: "#960226" // 设置虚线的颜色
+        }
+      },
+      formatter: function(params) {
+        // 由于 trigger 为 axis，params 数组中至少有一个对象，其 axisValue 为当前的 x 轴数值
+        if (params && params.length > 0) {
+          let value = params[0].axisValue;
+          let h = Math.floor(value);
+          let m = Math.round((value - h) * 60);
+          return (h < 10 ? "0" + h : h) + ":" + (m === 0 ? "00" : (m < 10 ? "0" + m : m));
+        }
+        return "";
+      }
+    },
     grid: {
       containLabel: true, // 避免文字被遮挡
-      left: '5%', right: '5%', top: '5%', bottom: '1%' },
+      left: '5%', right: '5%', top: '5%', bottom: '1%'
+    },
     xAxis: {
       type: "value",
       min: 6,
@@ -906,7 +955,7 @@ function renderSpringChart() {
       interval: 1,
       axisLine: { show: false },
       axisLabel: {
-        rotate: 45,
+        rotate: 60,
         formatter: function(value) {
           let h = Math.floor(value);
           let m = Math.round((value - h) * 60);
@@ -938,6 +987,7 @@ function renderSpringChart() {
 
   myChart.setOption(option);
 }
+
 
 
 /* =====================
